@@ -46,8 +46,8 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
     card_dict = {}
 
     page = requests.get(url, headers=headers)
-    if debug:
-        print(page.status_code,"\n")
+    # if debug:
+    #     print(page.status_code,"\n")
 
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, "html.parser")
@@ -57,35 +57,35 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
 
         card_gallery = card.find("div", class_="gallery__stage-shaft")
         card_dict["gallery"] = []
-        if debug:
-            print("Галлерея")
+        # if debug:
+        #     print("Галлерея")
         try:
             for div_img in card_gallery.find_all("div", class_="gallery__frame"):
                 img = div_img.find("img")
-                if debug:
-                    print(img["data-srcset"])
+                # if debug:
+                #     print(img["data-srcset"])
                 card_dict["gallery"].append(img["data-srcset"].split()[0])
         except:
             pass
 
         card_title = card.find(class_="card__title")
-        if debug:
-            print(f"card_title: {card_title.text}")
+        # if debug:
+        #     print(f"card_title: {card_title.text}")
         card_dict["title"] = card_title.text
 
         card_price_primary = card.find(class_="card__price-primary")
-        if debug:
-            print(f"card_price_primary: {card_price_primary.text}")
+        # if debug:
+        #     print(f"card_price_primary: {card_price_primary.text}")
         card_dict["price_primary"] = card_price_primary.text
 
         card_price_secondary = card.find(class_="card__price-secondary")
-        if debug:
-            print(f"card__price-secondary: {card_price_secondary.text}")
+        # if debug:
+        #     print(f"card__price-secondary: {card_price_secondary.text}")
         card_dict["price_secondary"] = card_price_secondary.text
 
         card_comment = card.find("div", class_="card__comment-text")
-        if debug:
-            print(f"card_comment: {card_comment.text}")
+        # if debug:
+        #     print(f"card_comment: {card_comment.text}")
         try:
             card_dict["comment"] = card_comment.get_text(separator="|", strip=True)
         except:
@@ -112,13 +112,13 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
 
         card_params = card.find("div", class_="card__params")
         card_description = card.find("div", class_="card__description")
-        if debug:
-            print(f"card_description: {card_params.text}\n{card_description.text}")
+        # if debug:
+        #     print(f"card_description: {card_params.text}\n{card_description.text}")
         card_dict["description"] = card_params.text + " | " + card_description.text
 
         card_exchange = card.find(class_="card__exchange-title")
-        if debug:
-            print(f"card_exchange: {card_exchange.text}")
+        # if debug:
+        #     print(f"card_exchange: {card_exchange.text}")
         card_dict["exchange"] = card_exchange.text
 
         card_dict["scrap_date"] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
@@ -132,14 +132,14 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
             section_dict = {}
 
             category = section.find(class_="card__options-category")
-            if debug:
-                print(f"category: {category.text}")
+            # if debug:
+            #     print(f"category: {category.text}")
             section_dict["category"] = category.text
 
             section_dict["items"] = []
             for option in section.find_all(class_="card__options-item"):
-                if debug:
-                    print(f"   - {option.text}")
+                # if debug:
+                #     print(f"   - {option.text}")
                 section_dict["items"].append(option.text)
 
             card_dict["options"].append(section_dict)
@@ -156,8 +156,8 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
         except:
             pass
 
-        if debug:
-            print("\n",str(card_dict).replace("\\xa0", " ").replace("\\u2009", " "))
+        # if debug:
+        #     print("\n",str(card_dict).replace("\\xa0", " ").replace("\\u2009", " "))
 
     return card_dict
 
@@ -192,11 +192,6 @@ def make_folder(start_folder, subfolders_chain):
     return folder
 
 def main():
-    # headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    # from fake_useragent import UserAgent
-    # ua = UserAgent()
-    # headers = ua.random
-
     make_folder(f"{os.curdir}", ["scrapped_cards", "AV_BY", "JSON", start_time_str])
     make_folder(f"{os.curdir}", ["scrapped_cards", "AV_BY", "CSV", start_time_str])
     make_folder(f"{os.curdir}", ["logs", "AV_BY", start_time_str])
@@ -231,7 +226,7 @@ def main():
 
         for year in range(curr_year, 1900, -1):
             for price_usd in range(0, 500001, 10000):
-                for page_num in range(1, 120):
+                for page_num in range(1, 500):
                     url = f"{SITE_URL}/filter?year[min]={year}&year[max]={year}&price_usd[min]={price_usd}&price_usd[max]={price_usd+9999}&page={page_num}"
                     print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
 
@@ -249,7 +244,7 @@ def main():
                         card_id = url_updated.split("-")[-1]
 
                         parsed_card = get_parsed_card(url)
-                        # print(parsed_card, "\n")
+
                         if parsed_card == {}:
                             continue
 
