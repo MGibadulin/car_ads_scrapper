@@ -24,10 +24,10 @@ DEFAULT_HEADER = headers #{'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X
 
 SITE_URL = "https://www.cars.com"
 
-CSV_CARD_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/csv/{start_time_str}/CARS_COM_card.csv"
-CSV_CARD_GALLERY_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/csv/{start_time_str}/CARS_COM_card_gallery.csv"
-CSV_CARD_OPTIONS_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/csv/{start_time_str}/CARS_COM_card_options.csv"
-CSV_CARD_URL_CARS_COM = f"scrapped_cards/CARS_COM/csv/{start_time_str}/CARS_COM_card_url.csv"
+CSV_CARD_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card.csv"
+CSV_CARD_GALLERY_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_gallery.csv"
+CSV_CARD_OPTIONS_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_options.csv"
+CSV_CARD_URL_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_url.csv"
 LOG_FILENAME_CARS_COM = f"./logs/CARS_COM/{start_time_str}/CARS_COM_log.txt"
 
 

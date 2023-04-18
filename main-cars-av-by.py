@@ -13,10 +13,10 @@ DEFAULT_HEADER = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1)
 
 SITE_URL = "https://cars.av.by"
 
-CSV_CARD_FILENAME_AV_BY = f"scrapped_cards/AV_BY/csv/{start_time_str}/cars-av-by_card.csv"
-CSV_CARD_GALLERY_FILENAME_AV_BY = f"scrapped_cards/AV_BY/csv/{start_time_str}/cars-av-by_card_gallery.csv"
-CSV_CARD_OPTIONS_FILENAME_AV_BY = f"scrapped_cards/AV_BY/csv/{start_time_str}/cars-av-by_card_options.csv"
-CSV_CARD_URL_AV_BY = f"scrapped_cards/AV_BY/csv/{start_time_str}/cars-av-by_card_url.csv"
+CSV_CARD_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card.csv"
+CSV_CARD_GALLERY_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_gallery.csv"
+CSV_CARD_OPTIONS_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_options.csv"
+CSV_CARD_URL_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_url.csv"
 LOG_FILENAME_AV_BY = f"./logs/AV_BY/{start_time_str}/cars-av-by_log.txt"
 
 def get_info_from_next_data(text):
