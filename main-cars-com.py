@@ -24,10 +24,6 @@ DEFAULT_HEADER = headers #{'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X
 
 SITE_URL = "https://www.cars.com"
 
-CSV_CARD_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card.csv"
-CSV_CARD_GALLERY_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_gallery.csv"
-CSV_CARD_OPTIONS_FILENAME_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_options.csv"
-CSV_CARD_URL_CARS_COM = f"scrapped_cards/CARS_COM/CSV/{start_time_str}/CARS_COM_card_url.csv"
 LOG_FILENAME_CARS_COM = f"./logs/CARS_COM/{start_time_str}/CARS_COM_log.txt"
 
 
@@ -41,6 +37,8 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
 
         card = soup.find("section", class_="listing-overview")
         # print(card,"\n")
+        if card == None:
+            return card_dict # {} - empty result
 
         card_gallery = card.find("div", class_="modal-slides-and-controls")
         card_dict["gallery"] = []
@@ -121,7 +119,7 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
 
         card_comment = basic_content.find("div", class_="sellers-notes")
         try:
-            card_dict["comment"] = card_comment.get_text(separator="|", strip=True)
+            card_dict["comment"] = card_comment.get_text(separator="|", strip=True).replace("\n", "|")
         except:
             card_dict["comment"] = ""
 
@@ -157,14 +155,14 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
             pass
 
         card_dict["description"] = card_dict["title"].split()[0] + ", " + \
-                                   card_dict["transmission"] + ", " + \
-                                   card_dict["engine"] + ", " + \
-                                   card_dict["fuel type"] + \
+                                   card_dict["transmission"].replace(",", " ") + ", " + \
+                                   card_dict["engine"].replace(",", " ") + ", " + \
+                                   card_dict["fuel type"].replace(",", " ") + \
                                    ((" (" + mpg + " mpg)") if mpg else "") + ", " + \
-                                   card_dict["mileage"].replace(",", ".") +" | " + \
-                                   card_dict["bodystyle"] + ", " + \
-                                   card_dict["drivetrain"] + ", " + \
-                                   card_dict["exterior color"]
+                                   card_dict["mileage"].replace(",", " ") +" | " + \
+                                   card_dict["bodystyle"].replace(",", " ") + ", " + \
+                                   card_dict["drivetrain"].replace(",", " ") + ", " + \
+                                   card_dict["exterior color"].replace(",", " ")
 
         del card_dict["transmission"]
         del card_dict["engine"]
@@ -221,30 +219,8 @@ def main():
     make_folder(f"{os.curdir}", ["scrapped_cards", "CARS_COM", "CSV", start_time_str])
     make_folder(f"{os.curdir}", ["logs", "CARS_COM", start_time_str])
 
-    with \
-            open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, \
-            open(CSV_CARD_FILENAME_CARS_COM, 'a', newline="", encoding="utf-8") as card_csvfile, \
-            open(CSV_CARD_GALLERY_FILENAME_CARS_COM, 'a', newline="", encoding="utf-8") as card_gallery_csvfile, \
-            open(CSV_CARD_OPTIONS_FILENAME_CARS_COM, 'a', newline="", encoding="utf-8") as card_options_csvfile, \
-            open(CSV_CARD_URL_CARS_COM, 'a', newline="", encoding="utf-8") as card_url_csvfile:
-
+    with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file:
         print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
-
-        card_fieldnames = "card_id,title,price_primary,price_history,location,labels,comment,description,vehicle_history,scrap_date".split(",")
-        card_writer = csv.DictWriter(card_csvfile, fieldnames=card_fieldnames)
-        card_writer.writeheader()
-
-        card_gallery_fieldnames = "card_id,ind,url,scrap_date".split(",")
-        card_gallery_writer = csv.DictWriter(card_gallery_csvfile, fieldnames=card_gallery_fieldnames)
-        card_gallery_writer.writeheader()
-
-        card_options_fieldnames = "card_id,category,item,scrap_date".split(",")
-        card_options_writer = csv.DictWriter(card_options_csvfile, fieldnames=card_options_fieldnames)
-        card_options_writer.writeheader()
-
-        card_url_fieldnames = "card_id,url,scrap_date".split(",")
-        card_url_writer = csv.DictWriter(card_url_csvfile, fieldnames=card_url_fieldnames)
-        card_url_writer.writeheader()
 
         url_num = 0
         curr_year = int(time.strftime("%Y", time.gmtime()))
@@ -293,30 +269,6 @@ def main():
                                               f"price_{price_usd}-{price_usd + 9999}"])
                         with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
                             f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
-
-                        parsed_card_csv = parsed_card.copy()
-
-                        del parsed_card_csv["gallery"]
-                        del parsed_card_csv["options"]
-                        del parsed_card_csv["json"]
-                        for key, value in parsed_card_csv.items():
-                            parsed_card_csv[key] = value.replace("\u00a0", " ").replace("\u2009", " ")
-                        card_writer.writerow(parsed_card_csv)
-
-                        card_url_csv_row = {"card_id": card_id, "url": url, "scrap_date": parsed_card["scrap_date"]}
-                        card_url_writer.writerow(card_url_csv_row)
-
-                        for img_ind, img_url in enumerate(parsed_card["gallery"]):
-                            card_gallery_csv_row = {"card_id": card_id, "ind": img_ind + 1, "url": img_url,
-                                                    "scrap_date": parsed_card["scrap_date"]}
-                            card_gallery_writer.writerow(card_gallery_csv_row)
-
-                        for section in parsed_card["options"]:
-                            category = section["category"]
-                            for item in section["items"]:
-                                card_options_csv_row = {"card_id": card_id, "category": category, "item": item,
-                                                        "scrap_date": parsed_card["scrap_date"]}
-                                card_options_writer.writerow(card_options_csv_row)
 
                     if len(card_url_list) < 20:
                         break

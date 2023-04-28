@@ -87,7 +87,7 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
         # if debug:
         #     print(f"card_comment: {card_comment.text}")
         try:
-            card_dict["comment"] = card_comment.get_text(separator="|", strip=True)
+            card_dict["comment"] = card_comment.get_text(separator="|", strip=True).replace("\n", "|")
         except:
             card_dict["comment"] = ""
 
