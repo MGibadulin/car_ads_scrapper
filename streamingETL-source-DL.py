@@ -177,6 +177,7 @@ def main():
         .add("description", StringType(), False) \
         .add("scrap_date", StringType(), False)
 
+    #print(os.getcwd()+"/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/")
     #source file streaming - go through all the existing files, then wait for new files appeared
     source_df = spark \
         .readStream \
@@ -185,7 +186,7 @@ def main():
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", "C:/Users/User/PycharmProjects/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/") \
+        .option("path", os.getcwd()+"/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/") \
         .load() \
         .withColumn("input_file_name", input_file_name())
 
@@ -200,7 +201,7 @@ def main():
     transformed_df = spark.sql("""
         select card_id,
                title,
-               substring(title, 6, len(title) - 5) as vehicle,
+               substring(title, 6, length(title) - 5) as vehicle,
                cast(substring(title, 1, 4) as int) as year,
                concat(
                   cast((cast(replace(replace(price_primary, '$', ''), ',', '') as int) div 10000)*10000 as string),
@@ -213,13 +214,13 @@ def main():
                location,
                labels,
                description,
-               split_part(description, ',', 2) as transmission,
-               split_part(description, ',', 3) as engine,
-               split_part(description, ',', 4) as fuel,
-               split_part(split_part(description, ',', 5), '|', 1) as milage,
-               split_part(split_part(description, ',', 5), '|', 2) as body,
-               split_part(description, ',', 6) as drive,
-               split_part(description, ',', 7) as color,
+               split(description, ',')[1] as transmission,
+               split(description, ',')[2] as engine,
+               split(description, ',')[3] as fuel,
+               split(split(description, ',')[4], '[|]')[0] as milage,
+               split(split(description, ',')[4], '[|]')[1] as body,
+               split(description, ',')[5] as drive,
+               split(description, ',')[6] as color,
                comment,
                vehicle_history,
                options,

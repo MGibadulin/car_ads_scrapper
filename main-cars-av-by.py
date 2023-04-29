@@ -225,7 +225,7 @@ def main():
         curr_year = int(time.strftime("%Y", time.gmtime()))
 
         for year in range(curr_year, 1900, -1):
-            for price_usd in range(0, 500001, 10000):
+            for price_usd in range(0, 500000, 10000):
                 for page_num in range(1, 500):
                     url = f"{SITE_URL}/filter?year[min]={year}&year[max]={year}&price_usd[min]={price_usd}&price_usd[max]={price_usd+9999}&page={page_num}"
                     print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
