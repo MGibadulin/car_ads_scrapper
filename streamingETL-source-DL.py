@@ -186,7 +186,7 @@ def main():
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", os.getcwd()+"/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/") \
+        .option("path", os.path.abspath(os.getcwd()) + "/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/") \
         .load() \
         .withColumn("input_file_name", input_file_name())
 
