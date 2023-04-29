@@ -177,7 +177,7 @@ def main():
         .add("description", StringType(), False) \
         .add("scrap_date", StringType(), False)
 
-    #print(os.getcwd()+"/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/")
+    # print(os.getcwd() + "/scrapped_cards/CARS_COM/JSON/*/*/*/")
     #source file streaming - go through all the existing files, then wait for new files appeared
     source_df = spark \
         .readStream \
@@ -186,7 +186,7 @@ def main():
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", os.path.abspath(os.getcwd()) + "/car_ads_scrapper/scrapped_cards/CARS_COM/JSON/*/*/*/") \
+        .option("path", os.path.abspath(os.getcwd()) + "/scrapped_cards/CARS_COM/JSON/*/*/*/") \
         .load() \
         .withColumn("input_file_name", input_file_name())
 
