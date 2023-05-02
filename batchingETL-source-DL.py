@@ -7,7 +7,7 @@ from pyspark.sql.functions import input_file_name
 DEBUG_MODE = True        #instead of a hardcoded value, in future it'll become a console argument
 DEBUG_TOKENIZED_ATTRS = True
 
-spark = SparkSession.builder.master("local[*]").appName('car das - file streaming ETL (source to DL)') \
+spark = SparkSession.builder.master("local[*]").appName('car ads batch ETL (source to DL)') \
     .config('spark.driver.extraJavaOptions', '-Duser.timezone=GMT') \
     .config('spark.executor.extraJavaOptions', '-Duser.timezone=GMT') \
     .config('spark.sql.session.timeZone', 'UTC') \
@@ -26,7 +26,7 @@ def make_folder(start_folder, subfolders_chain):
     return folder
 
 
-def create_input_file_stream():
+def create_input_df():
     # schema of the source json files
     user_schema = StructType() \
         .add("gallery", ArrayType(StringType())) \
@@ -48,10 +48,9 @@ def create_input_file_stream():
         .add("scrap_date", StringType(), False)
 
     # print(os.getcwd() + "/scrapped_cards/CARS_COM/JSON/*/*/*/")
-    #source file streaming - go through all the existing files, then wait for new files appeared
+    #read source files - go through all the existing files
     source_df = spark \
-        .readStream \
-        .option("maxFilesPerTrigger", 20) \
+        .read \
         .format("json") \
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
@@ -62,14 +61,14 @@ def create_input_file_stream():
 
     return source_df
 
-def tokenize_stream_data(stream_df):
+def tokenize_data(df):
     # title: 2023 Hyundai Elantra SEL
     # description: 2023, Automatic, 3.8L V6 24V GDI DOHC, Gasoline, 7 mi. | pickup truck, Rear-wheel Drive, Tactical Green
     # price_primary: $19,995
     # price_history: 2/21/23: $22,987 | 3/23/23: $21,987 | 4/07/23: $20,931 | 4/21/23: $19,971
     # labels: Great Deal | $788 under|CPO Warrantied|Home Delivery|Virtual Appointments|VIN: 3KPA25AD0PE512839|Included warranty
 
-    stream_df.createOrReplaceTempView("source_micro_batch")
+    df.createOrReplaceTempView("source_df")
 
     transformed_df = spark.sql("""
         select card_id,
@@ -127,7 +126,7 @@ def tokenize_stream_data(stream_df):
                split(split(description, ', ')[4], ' [|] ')[1] as body,
                split(description, ', ')[5] as drive,
                split(description, ', ')[6] as color,
-               comment,
+               replace(comment, '\n', ' | ') as comment,
                vehicle_history,
                map_from_arrays(
                    regexp_extract_all(vehicle_history, '([^:]+): ([^|]+)[ ]?[|]?[ ]?', 1),
@@ -140,14 +139,14 @@ def tokenize_stream_data(stream_df):
                regexp_replace(input_file_name, 'file:[/]+', '') as input_file_name,
                replace(regexp_replace(input_file_name, 'file:[/]+', ''), 'scrapped_cards/', 'archived_cards/') as source_file_name,
                current_timestamp() as loaded_date
-        from source_micro_batch
+        from source_df
     """)
 
     return transformed_df
 
 
-def clean_stream_data(stream_df):
-    return stream_df.where("""
+def clean_data(df):
+    return df.where("""
             trim(transmission) not in ('', '–') and
             trim(engine) not in ('', '–') and
             trim(drive) not in ('', '–') and
@@ -155,17 +154,16 @@ def clean_stream_data(stream_df):
     """)
 
 
-def save_batch_data(micro_batch_df, epoch_id):
-    micro_batch_df = micro_batch_df.repartition(1)
-    micro_batch_df.persist()
+def save_data(df):
+    df = df.repartition(1)
+    df.persist()
 
     ETL_configs = [
         {
-
             "ETL_desc": "debug info",
             "format": "console",
-            "attr_list": #"card_id;vehicle;year;price;price_usd;location;labels;home_delivery;virtual_appointments;included_warranty;VIN;description;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;scrap_date;input_file_name;source_file_name" \
-                    "card_id;vehicle;year;price_range;price_primary;price_history;vehicle_history;vehicle_history_map;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;input_file_name" \
+            "attr_list": #"card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;loaded_date" \
+                    "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;description;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;scrap_date;source_file_name;loaded_date" \
                     if DEBUG_TOKENIZED_ATTRS else \
                          "card_id,title,price_primary,location,labels,description,scrap_date",
             "partitionBy": "",
@@ -174,11 +172,22 @@ def save_batch_data(micro_batch_df, epoch_id):
             "process": DEBUG_MODE
         },
         {
-            "ETL_desc": "card csv",
+            "ETL_desc": "card csv (direct)",
             "format": "csv",
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;location;labels;transmission;engine;fuel;milage;body;drive;color;comment;scrap_date;loaded_date",
-            "partitionBy": "year;price_range",
-            "options": {"header": True, "path": "stream/CARS_COM/CSV/car_card"},
+            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;loaded_date",
+            # "partitionBy": "year;price_range",
+            "partitionBy": "",
+            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card"},
+            "mode": "append",
+            "process": True
+        },
+        {
+            "ETL_desc": "card csv (tokenized)",
+            "format": "csv",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_file_name;loaded_date",
+            # "partitionBy": "year;price_range",
+            "partitionBy": "",
+            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_tokenized"},
             "mode": "append",
             "process": True
         },
@@ -186,8 +195,9 @@ def save_batch_data(micro_batch_df, epoch_id):
             "ETL_desc": "card_options csv",
             "format": "csv",
             "attr_list": "card_id;explode(options) as option_group;scrap_date;loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;loaded_date",
-            "partitionBy": "category",
-            "options": {"header": True, "truncate": False, "path": "stream/CARS_COM/CSV/car_card_options"},
+            # "partitionBy": "category",
+            "partitionBy": "",
+            "options": {"header": True, "truncate": False, "path": "batch/CARS_COM/CSV/car_card_options"},
             "mode": "append",
             "process": True
         },
@@ -196,7 +206,7 @@ def save_batch_data(micro_batch_df, epoch_id):
             "format": "csv",
             "attr_list": "card_id;url;source_file_name;scrap_date;loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": "stream/CARS_COM/CSV/car_card_info"},
+            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_info"},
             "mode": "append",
             "process": True
         },
@@ -205,7 +215,7 @@ def save_batch_data(micro_batch_df, epoch_id):
             "format": "csv",
             "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": "stream/CARS_COM/CSV/car_card_gallery"},
+            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_gallery"},
             "mode": "append",
             "process": True
         }
@@ -215,7 +225,7 @@ def save_batch_data(micro_batch_df, epoch_id):
         if not etl_config["process"]:
             continue
 
-        stage = micro_batch_df
+        stage = df
         for attrs_to_select in etl_config["attr_list"].split("|"):
             stage = stage.selectExpr(attrs_to_select.split(";"))
 
@@ -230,40 +240,20 @@ def save_batch_data(micro_batch_df, epoch_id):
         stage.save()
 
 
-    files_list = micro_batch_df.select("input_file_name", "source_file_name").collect()
+    files_list = df.select("input_file_name", "source_file_name").collect()
 
-    micro_batch_df.unpersist()
-
-    #archive the already processed source files
-    for rec in files_list:
-        input_file = rec["input_file_name"]     #.replace("file:/", "")
-        archived_file = rec["source_file_name"] #input_file.replace("scrapped_cards/", "archived_cards/")
-
-        folders_chain = archived_file.split("/")[:-1]
-        try:
-            make_folder(folders_chain[0], folders_chain[1:])
-            os.rename(input_file, archived_file)
-        except:
-            pass
+    df.unpersist()
 
 
 def main():
     #extract
-    source_df = create_input_file_stream()
+    source_df = create_input_df()
     #transform
-    tokenized_df = tokenize_stream_data(source_df)
-    cleaned_df = clean_stream_data(tokenized_df)
+    tokenized_df = tokenize_data(source_df)
+    cleaned_df = clean_data(tokenized_df)
     #load
-    stream_df = cleaned_df \
-        .writeStream \
-        .trigger(processingTime='3 seconds') \
-        .option("checkpointLocation", "stream/checkpoints") \
-        .option("encoding", "UTF-8") \
-        .outputMode('append') \
-        .foreachBatch(save_batch_data) \
-        .start()
+    save_data(cleaned_df)
 
-    stream_df.awaitTermination()
 
 
 if __name__ == "__main__":
