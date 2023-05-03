@@ -1,0 +1,488 @@
+start time (GMT): 08:00:22
+
+time: 00:00:00, url: https://www.cars.com/shopping/results/?list_price_max=9999&list_price_min=0&maximum_distance=all&page_size=20&page=1&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/e79eab7c-1a3a-4f45-9212-19cb42812688/
+time: 00:00:01, card: 1, year: 2023: https://www.cars.com/vehicledetail/e79eab7c-1a3a-4f45-9212-19cb42812688/
+
+time: 00:00:02, url: https://www.cars.com/shopping/results/?list_price_max=19999&list_price_min=10000&maximum_distance=all&page_size=20&page=1&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+https://www.cars.com/vehicledetail/5aad725a-0e9b-42d1-a8c2-cf0fb4a4d7ef/
+https://www.cars.com/vehicledetail/c6124cd7-b641-444e-949a-b86284af7871/
+https://www.cars.com/vehicledetail/a1456326-0bc4-474f-8f04-c83e4433708d/
+https://www.cars.com/vehicledetail/dc38c584-e589-465e-888a-f2d628f404db/
+https://www.cars.com/vehicledetail/ec9eadd0-8800-41b6-9878-963806819278/
+https://www.cars.com/vehicledetail/6ab5b855-60d8-44ad-bdcb-8047a36bf983/
+https://www.cars.com/vehicledetail/0fca9827-8ee3-468d-b9a4-0edd2147a80e/
+https://www.cars.com/vehicledetail/b5dadb09-8de6-43b2-bba1-b574cb533e2e/
+https://www.cars.com/vehicledetail/8ccb5ce0-e48d-44f3-b6a3-574bb9db9d5e/
+https://www.cars.com/vehicledetail/06b3ea78-d66c-412d-bd79-0b223870dd96/
+https://www.cars.com/vehicledetail/121bd2b2-8489-4804-83e5-72fc6d79fdbe/
+https://www.cars.com/vehicledetail/7f4dd660-b404-4729-ad2c-fbb7e4a69cc3/
+https://www.cars.com/vehicledetail/5513790c-e02c-402f-bd8d-33ddf083f076/
+https://www.cars.com/vehicledetail/c12ebfcb-2377-4737-a172-107ecef4d9ce/
+https://www.cars.com/vehicledetail/5f19c378-a8ae-42ad-84f5-a0e65f2e90a1/
+https://www.cars.com/vehicledetail/92e1ba3a-96f8-4f99-b4c9-6e0f4f38cbba/
+https://www.cars.com/vehicledetail/4a849826-8beb-4226-9658-0d5fe2da31d9/
+https://www.cars.com/vehicledetail/d4ac1f49-cb00-4929-a522-f325361a9c46/
+https://www.cars.com/vehicledetail/3083a403-77a2-41ec-94a6-0bcfc6e8aea9/
+https://www.cars.com/vehicledetail/2af3c03d-c35d-4651-93d3-a34abb96a56e/
+time: 00:00:04, card: 2, year: 2023: https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+time: 00:00:04, card: 3, year: 2023: https://www.cars.com/vehicledetail/5aad725a-0e9b-42d1-a8c2-cf0fb4a4d7ef/
+time: 00:00:06, card: 4, year: 2023: https://www.cars.com/vehicledetail/c6124cd7-b641-444e-949a-b86284af7871/
+time: 00:00:07, card: 5, year: 2023: https://www.cars.com/vehicledetail/a1456326-0bc4-474f-8f04-c83e4433708d/
+time: 00:00:09, card: 6, year: 2023: https://www.cars.com/vehicledetail/dc38c584-e589-465e-888a-f2d628f404db/
+time: 00:00:11, card: 7, year: 2023: https://www.cars.com/vehicledetail/ec9eadd0-8800-41b6-9878-963806819278/
+time: 00:00:13, card: 8, year: 2023: https://www.cars.com/vehicledetail/6ab5b855-60d8-44ad-bdcb-8047a36bf983/
+time: 00:00:14, card: 9, year: 2023: https://www.cars.com/vehicledetail/0fca9827-8ee3-468d-b9a4-0edd2147a80e/
+time: 00:00:16, card: 10, year: 2023: https://www.cars.com/vehicledetail/b5dadb09-8de6-43b2-bba1-b574cb533e2e/
+time: 00:00:18, card: 11, year: 2023: https://www.cars.com/vehicledetail/8ccb5ce0-e48d-44f3-b6a3-574bb9db9d5e/
+time: 00:00:19, card: 12, year: 2023: https://www.cars.com/vehicledetail/06b3ea78-d66c-412d-bd79-0b223870dd96/
+time: 00:00:21, card: 13, year: 2023: https://www.cars.com/vehicledetail/121bd2b2-8489-4804-83e5-72fc6d79fdbe/
+time: 00:00:23, card: 14, year: 2023: https://www.cars.com/vehicledetail/7f4dd660-b404-4729-ad2c-fbb7e4a69cc3/
+time: 00:00:24, card: 15, year: 2023: https://www.cars.com/vehicledetail/5513790c-e02c-402f-bd8d-33ddf083f076/
+time: 00:00:26, card: 16, year: 2023: https://www.cars.com/vehicledetail/c12ebfcb-2377-4737-a172-107ecef4d9ce/
+time: 00:00:28, card: 17, year: 2023: https://www.cars.com/vehicledetail/5f19c378-a8ae-42ad-84f5-a0e65f2e90a1/
+time: 00:00:29, card: 18, year: 2023: https://www.cars.com/vehicledetail/92e1ba3a-96f8-4f99-b4c9-6e0f4f38cbba/
+time: 00:00:31, card: 19, year: 2023: https://www.cars.com/vehicledetail/4a849826-8beb-4226-9658-0d5fe2da31d9/
+time: 00:00:33, card: 20, year: 2023: https://www.cars.com/vehicledetail/d4ac1f49-cb00-4929-a522-f325361a9c46/
+time: 00:00:34, card: 21, year: 2023: https://www.cars.com/vehicledetail/3083a403-77a2-41ec-94a6-0bcfc6e8aea9/
+time: 00:00:36, card: 22, year: 2023: https://www.cars.com/vehicledetail/2af3c03d-c35d-4651-93d3-a34abb96a56e/
+
+time: 00:00:37, url: https://www.cars.com/shopping/results/?list_price_max=19999&list_price_min=10000&maximum_distance=all&page_size=20&page=2&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+https://www.cars.com/vehicledetail/fe55df10-a715-4037-bdb4-8f358a58c2a3/
+https://www.cars.com/vehicledetail/f0e32fb3-e99a-4394-963f-0325bd387028/
+https://www.cars.com/vehicledetail/3e72d656-da5b-42a3-bfb0-6672f38c6170/
+https://www.cars.com/vehicledetail/ebc654f6-b1ad-4e24-b20a-f6d9b3e2b913/
+https://www.cars.com/vehicledetail/5208ebc6-ebdf-45bd-a94a-32953f259b98/
+https://www.cars.com/vehicledetail/7a16bd04-4f5c-48b0-a092-5fad7e1bb28f/
+https://www.cars.com/vehicledetail/a3192135-d402-46d4-b49f-0b16ba739ffe/
+https://www.cars.com/vehicledetail/8f841e27-9cd0-4f8f-8a10-5cdfee5dfa02/
+https://www.cars.com/vehicledetail/e421751c-9802-4420-a979-613cfa3b4963/
+https://www.cars.com/vehicledetail/0a799c79-9e37-4dad-a30d-83aeb61beda2/
+https://www.cars.com/vehicledetail/fa773366-fbcd-4edc-8b92-997d7e177c9d/
+https://www.cars.com/vehicledetail/9f7109df-447b-4544-a356-6f636367df50/
+https://www.cars.com/vehicledetail/3affd053-e328-4244-93ab-f739b7496f53/
+https://www.cars.com/vehicledetail/cfe548de-9d42-4fd3-b4b7-87b983a81caa/
+https://www.cars.com/vehicledetail/2de754f9-bb40-4131-98d3-4b6d490e95d1/
+https://www.cars.com/vehicledetail/a3f4700d-f086-4146-b271-065aea19f479/
+https://www.cars.com/vehicledetail/45094406-8f86-4d0d-ad0e-ff23f12f2ff8/
+https://www.cars.com/vehicledetail/d91a2c8e-34d3-46cc-9f3c-31eeab1db344/
+https://www.cars.com/vehicledetail/bc7b1da5-b9d7-4c73-955a-4b7bc62194ae/
+https://www.cars.com/vehicledetail/c953c1a2-1589-4b37-b0e4-d55fbfa1a9b1/
+time: 00:00:39, card: 23, year: 2023: https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+time: 00:00:39, card: 24, year: 2023: https://www.cars.com/vehicledetail/fe55df10-a715-4037-bdb4-8f358a58c2a3/
+time: 00:00:41, card: 25, year: 2023: https://www.cars.com/vehicledetail/f0e32fb3-e99a-4394-963f-0325bd387028/
+time: 00:00:42, card: 26, year: 2023: https://www.cars.com/vehicledetail/3e72d656-da5b-42a3-bfb0-6672f38c6170/
+time: 00:00:43, card: 27, year: 2023: https://www.cars.com/vehicledetail/ebc654f6-b1ad-4e24-b20a-f6d9b3e2b913/
+time: 00:00:45, card: 28, year: 2023: https://www.cars.com/vehicledetail/5208ebc6-ebdf-45bd-a94a-32953f259b98/
+time: 00:00:46, card: 29, year: 2023: https://www.cars.com/vehicledetail/7a16bd04-4f5c-48b0-a092-5fad7e1bb28f/
+time: 00:00:48, card: 30, year: 2023: https://www.cars.com/vehicledetail/a3192135-d402-46d4-b49f-0b16ba739ffe/
+time: 00:00:49, card: 31, year: 2023: https://www.cars.com/vehicledetail/8f841e27-9cd0-4f8f-8a10-5cdfee5dfa02/
+time: 00:00:50, card: 32, year: 2023: https://www.cars.com/vehicledetail/e421751c-9802-4420-a979-613cfa3b4963/
+time: 00:00:52, card: 33, year: 2023: https://www.cars.com/vehicledetail/0a799c79-9e37-4dad-a30d-83aeb61beda2/
+time: 00:00:53, card: 34, year: 2023: https://www.cars.com/vehicledetail/fa773366-fbcd-4edc-8b92-997d7e177c9d/
+time: 00:00:55, card: 35, year: 2023: https://www.cars.com/vehicledetail/9f7109df-447b-4544-a356-6f636367df50/
+time: 00:00:57, card: 36, year: 2023: https://www.cars.com/vehicledetail/3affd053-e328-4244-93ab-f739b7496f53/
+time: 00:00:58, card: 37, year: 2023: https://www.cars.com/vehicledetail/cfe548de-9d42-4fd3-b4b7-87b983a81caa/
+time: 00:01:00, card: 38, year: 2023: https://www.cars.com/vehicledetail/2de754f9-bb40-4131-98d3-4b6d490e95d1/
+time: 00:01:01, card: 39, year: 2023: https://www.cars.com/vehicledetail/a3f4700d-f086-4146-b271-065aea19f479/
+time: 00:01:03, card: 40, year: 2023: https://www.cars.com/vehicledetail/45094406-8f86-4d0d-ad0e-ff23f12f2ff8/
+time: 00:01:05, card: 41, year: 2023: https://www.cars.com/vehicledetail/d91a2c8e-34d3-46cc-9f3c-31eeab1db344/
+time: 00:01:06, card: 42, year: 2023: https://www.cars.com/vehicledetail/bc7b1da5-b9d7-4c73-955a-4b7bc62194ae/
+time: 00:01:08, card: 43, year: 2023: https://www.cars.com/vehicledetail/c953c1a2-1589-4b37-b0e4-d55fbfa1a9b1/
+
+time: 00:01:10, url: https://www.cars.com/shopping/results/?list_price_max=19999&list_price_min=10000&maximum_distance=all&page_size=20&page=3&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+https://www.cars.com/vehicledetail/15597dfa-c2c8-4dfe-8ab9-b9849b26a9d2/
+https://www.cars.com/vehicledetail/15df53df-7558-4ce0-93ec-e20a3055b5f9/
+https://www.cars.com/vehicledetail/29eccd64-fdef-4619-a65e-5ac773482cb1/
+https://www.cars.com/vehicledetail/e023a5e6-c91f-43dd-a907-f7dc2544ca57/
+https://www.cars.com/vehicledetail/1123b46a-5e8e-4416-a24d-1f27aa28233a/
+https://www.cars.com/vehicledetail/9c3bcfcc-d17f-4e4c-9168-246ee9024337/
+time: 00:01:12, card: 44, year: 2023: https://www.cars.com/vehicledetail/da32596c-5ca4-45d4-87d6-33b26a1671bc/?attribution_type=premier
+time: 00:01:12, card: 45, year: 2023: https://www.cars.com/vehicledetail/15597dfa-c2c8-4dfe-8ab9-b9849b26a9d2/
+time: 00:01:13, card: 46, year: 2023: https://www.cars.com/vehicledetail/15df53df-7558-4ce0-93ec-e20a3055b5f9/
+time: 00:01:15, card: 47, year: 2023: https://www.cars.com/vehicledetail/29eccd64-fdef-4619-a65e-5ac773482cb1/
+time: 00:01:17, card: 48, year: 2023: https://www.cars.com/vehicledetail/e023a5e6-c91f-43dd-a907-f7dc2544ca57/
+time: 00:01:18, card: 49, year: 2023: https://www.cars.com/vehicledetail/1123b46a-5e8e-4416-a24d-1f27aa28233a/
+time: 00:01:19, card: 50, year: 2023: https://www.cars.com/vehicledetail/9c3bcfcc-d17f-4e4c-9168-246ee9024337/
+
+time: 00:01:21, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=1&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/fc9ac8b0-c9c6-45db-bdca-5646bd5a9132/
+https://www.cars.com/vehicledetail/d4fd47c1-0ae1-4837-9e30-ba8ba9fc5fa8/
+https://www.cars.com/vehicledetail/f4fccbba-3ddb-4f85-b623-63c2018701c0/
+https://www.cars.com/vehicledetail/aa1cc472-20c7-421b-80c9-61f53c0e8003/
+https://www.cars.com/vehicledetail/bc4bab4f-8986-4100-8aa7-f1737f24e73f/
+https://www.cars.com/vehicledetail/bed11372-b325-4b54-8ef9-d1354ca7fd67/
+https://www.cars.com/vehicledetail/3270273e-c736-412f-abfe-af342957e5b1/
+https://www.cars.com/vehicledetail/079d27f7-d71b-462d-816a-ef2be30a6de0/
+https://www.cars.com/vehicledetail/c5d860a9-2ebc-4836-837f-3f6a7434cfc1/
+https://www.cars.com/vehicledetail/56e8126d-d6f2-4556-8431-a4329de38352/
+https://www.cars.com/vehicledetail/de453f72-9015-4f6c-b683-3317043eebee/
+https://www.cars.com/vehicledetail/d5fb9b73-028c-4f6c-a8de-467bb4379762/
+https://www.cars.com/vehicledetail/c7229f86-3f45-49df-b5b4-0f360494d772/
+https://www.cars.com/vehicledetail/ad02f592-65e8-4b9c-be3c-532175d12d2b/
+https://www.cars.com/vehicledetail/5d30f8d7-0915-48c7-8ba1-9f6ee3fc5c47/
+https://www.cars.com/vehicledetail/1212e1a1-9505-4e88-bdd2-038af349ebb8/
+https://www.cars.com/vehicledetail/829195c6-cf00-412b-ac23-22c95daf74f0/
+https://www.cars.com/vehicledetail/729fc429-9008-4a9d-946f-4816437d62c7/
+https://www.cars.com/vehicledetail/8377d547-a65e-4653-8e70-c2ad8d3bb0e3/
+https://www.cars.com/vehicledetail/fc38ff85-5190-4755-9fb4-578e54a1c929/
+time: 00:01:22, card: 51, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:01:22, card: 52, year: 2023: https://www.cars.com/vehicledetail/fc9ac8b0-c9c6-45db-bdca-5646bd5a9132/
+time: 00:01:24, card: 53, year: 2023: https://www.cars.com/vehicledetail/d4fd47c1-0ae1-4837-9e30-ba8ba9fc5fa8/
+time: 00:01:26, card: 54, year: 2023: https://www.cars.com/vehicledetail/f4fccbba-3ddb-4f85-b623-63c2018701c0/
+time: 00:01:29, card: 55, year: 2023: https://www.cars.com/vehicledetail/aa1cc472-20c7-421b-80c9-61f53c0e8003/
+time: 00:01:31, card: 56, year: 2023: https://www.cars.com/vehicledetail/bc4bab4f-8986-4100-8aa7-f1737f24e73f/
+time: 00:01:32, card: 57, year: 2023: https://www.cars.com/vehicledetail/bed11372-b325-4b54-8ef9-d1354ca7fd67/
+time: 00:01:34, card: 58, year: 2023: https://www.cars.com/vehicledetail/3270273e-c736-412f-abfe-af342957e5b1/
+time: 00:01:35, card: 59, year: 2023: https://www.cars.com/vehicledetail/079d27f7-d71b-462d-816a-ef2be30a6de0/
+time: 00:01:37, card: 60, year: 2023: https://www.cars.com/vehicledetail/c5d860a9-2ebc-4836-837f-3f6a7434cfc1/
+time: 00:01:38, card: 61, year: 2023: https://www.cars.com/vehicledetail/56e8126d-d6f2-4556-8431-a4329de38352/
+time: 00:01:40, card: 62, year: 2023: https://www.cars.com/vehicledetail/de453f72-9015-4f6c-b683-3317043eebee/
+time: 00:01:42, card: 63, year: 2023: https://www.cars.com/vehicledetail/d5fb9b73-028c-4f6c-a8de-467bb4379762/
+time: 00:01:44, card: 64, year: 2023: https://www.cars.com/vehicledetail/c7229f86-3f45-49df-b5b4-0f360494d772/
+time: 00:01:46, card: 65, year: 2023: https://www.cars.com/vehicledetail/ad02f592-65e8-4b9c-be3c-532175d12d2b/
+time: 00:01:47, card: 66, year: 2023: https://www.cars.com/vehicledetail/5d30f8d7-0915-48c7-8ba1-9f6ee3fc5c47/
+time: 00:01:48, card: 67, year: 2023: https://www.cars.com/vehicledetail/1212e1a1-9505-4e88-bdd2-038af349ebb8/
+time: 00:01:50, card: 68, year: 2023: https://www.cars.com/vehicledetail/829195c6-cf00-412b-ac23-22c95daf74f0/
+time: 00:01:52, card: 69, year: 2023: https://www.cars.com/vehicledetail/729fc429-9008-4a9d-946f-4816437d62c7/
+time: 00:01:54, card: 70, year: 2023: https://www.cars.com/vehicledetail/8377d547-a65e-4653-8e70-c2ad8d3bb0e3/
+time: 00:01:55, card: 71, year: 2023: https://www.cars.com/vehicledetail/fc38ff85-5190-4755-9fb4-578e54a1c929/
+
+time: 00:01:57, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=2&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/193d5a57-e4b6-4d13-845e-8f0b52486b40/
+https://www.cars.com/vehicledetail/e8bc6399-3af6-4d73-abe0-9eedff6be301/
+https://www.cars.com/vehicledetail/95d17b40-870f-4abb-8126-e214e2fb2502/
+https://www.cars.com/vehicledetail/ced6fe3b-d012-45e9-b2d9-5575ca71052d/
+https://www.cars.com/vehicledetail/43c8674f-1313-4183-84e3-e5f7ffc9acce/
+https://www.cars.com/vehicledetail/af9113ea-7038-4d7f-83a8-51e982c6e4cf/
+https://www.cars.com/vehicledetail/fbe99afb-1667-4043-a5ff-4c0dc8fa83cb/
+https://www.cars.com/vehicledetail/1e59b57a-0a84-466d-85b2-ce4c061a6fba/
+https://www.cars.com/vehicledetail/7e90e604-2f2c-4e7f-834f-3fd5eda2313c/
+https://www.cars.com/vehicledetail/453bd5d5-361f-43d6-80ff-d948b5dba45e/
+https://www.cars.com/vehicledetail/eb0c6731-0088-49ba-8978-dd7550e6d5b5/
+https://www.cars.com/vehicledetail/080f0e0a-16a0-4268-9085-6d47a7818431/
+https://www.cars.com/vehicledetail/570d39e4-9cfe-4604-89a7-78ee5f781547/
+https://www.cars.com/vehicledetail/62775de4-d46e-456b-86b3-748f66fe1df4/
+https://www.cars.com/vehicledetail/8a06d0b2-4f0c-439c-bc41-bb5782efe7f2/
+https://www.cars.com/vehicledetail/622a8ce6-25c7-42b0-9d5b-b0988f8f81e8/
+https://www.cars.com/vehicledetail/0b10aac8-74de-47ad-aa75-756ee7cea676/
+https://www.cars.com/vehicledetail/51b8a4d1-c68b-4f30-bb9f-147e4e5231c8/
+https://www.cars.com/vehicledetail/c5658586-7522-45c7-9e4a-a69d6af96001/
+https://www.cars.com/vehicledetail/846423cd-8b9c-4e13-a808-7e1921435095/
+time: 00:01:59, card: 72, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:01:59, card: 73, year: 2023: https://www.cars.com/vehicledetail/193d5a57-e4b6-4d13-845e-8f0b52486b40/
+time: 00:02:01, card: 74, year: 2023: https://www.cars.com/vehicledetail/e8bc6399-3af6-4d73-abe0-9eedff6be301/
+time: 00:02:02, card: 75, year: 2023: https://www.cars.com/vehicledetail/95d17b40-870f-4abb-8126-e214e2fb2502/
+time: 00:02:04, card: 76, year: 2023: https://www.cars.com/vehicledetail/ced6fe3b-d012-45e9-b2d9-5575ca71052d/
+time: 00:02:06, card: 77, year: 2023: https://www.cars.com/vehicledetail/43c8674f-1313-4183-84e3-e5f7ffc9acce/
+time: 00:02:08, card: 78, year: 2023: https://www.cars.com/vehicledetail/af9113ea-7038-4d7f-83a8-51e982c6e4cf/
+time: 00:02:10, card: 79, year: 2023: https://www.cars.com/vehicledetail/fbe99afb-1667-4043-a5ff-4c0dc8fa83cb/
+time: 00:02:11, card: 80, year: 2023: https://www.cars.com/vehicledetail/1e59b57a-0a84-466d-85b2-ce4c061a6fba/
+time: 00:02:13, card: 81, year: 2023: https://www.cars.com/vehicledetail/7e90e604-2f2c-4e7f-834f-3fd5eda2313c/
+time: 00:02:15, card: 82, year: 2023: https://www.cars.com/vehicledetail/453bd5d5-361f-43d6-80ff-d948b5dba45e/
+time: 00:02:17, card: 83, year: 2023: https://www.cars.com/vehicledetail/eb0c6731-0088-49ba-8978-dd7550e6d5b5/
+time: 00:02:18, card: 84, year: 2023: https://www.cars.com/vehicledetail/080f0e0a-16a0-4268-9085-6d47a7818431/
+time: 00:02:20, card: 85, year: 2023: https://www.cars.com/vehicledetail/570d39e4-9cfe-4604-89a7-78ee5f781547/
+time: 00:02:21, card: 86, year: 2023: https://www.cars.com/vehicledetail/62775de4-d46e-456b-86b3-748f66fe1df4/
+time: 00:02:23, card: 87, year: 2023: https://www.cars.com/vehicledetail/8a06d0b2-4f0c-439c-bc41-bb5782efe7f2/
+time: 00:02:24, card: 88, year: 2023: https://www.cars.com/vehicledetail/622a8ce6-25c7-42b0-9d5b-b0988f8f81e8/
+time: 00:02:26, card: 89, year: 2023: https://www.cars.com/vehicledetail/0b10aac8-74de-47ad-aa75-756ee7cea676/
+time: 00:02:27, card: 90, year: 2023: https://www.cars.com/vehicledetail/51b8a4d1-c68b-4f30-bb9f-147e4e5231c8/
+time: 00:02:29, card: 91, year: 2023: https://www.cars.com/vehicledetail/c5658586-7522-45c7-9e4a-a69d6af96001/
+time: 00:02:30, card: 92, year: 2023: https://www.cars.com/vehicledetail/846423cd-8b9c-4e13-a808-7e1921435095/
+
+time: 00:02:32, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=3&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/77de13af-46b7-4c01-acf4-509b2339bd26/
+https://www.cars.com/vehicledetail/fa71a7ec-a5ec-420e-8ffa-0a80000e4463/
+https://www.cars.com/vehicledetail/1f9b3c8b-5e4b-4dc8-9f29-8aff15b258bb/
+https://www.cars.com/vehicledetail/48ea690a-d9e7-43ee-a931-5fc343654717/
+https://www.cars.com/vehicledetail/80cc7b0e-0353-4c8a-aab9-7b929c98ab8d/
+https://www.cars.com/vehicledetail/cd4fec88-0dd2-4d57-9b1e-1f8280a4e1a4/
+https://www.cars.com/vehicledetail/5224a828-d933-4a5d-9a93-c6abd319b1c0/
+https://www.cars.com/vehicledetail/c090ca1e-5aea-480f-94bf-a1e7ff7496db/
+https://www.cars.com/vehicledetail/5b22aaba-937a-4777-a6dc-756d493859af/
+https://www.cars.com/vehicledetail/a39b78d2-ce36-4473-9fb0-3ca9a705e32b/
+https://www.cars.com/vehicledetail/1ef7a36f-2e4e-42c2-bf57-193d7258b2b8/
+https://www.cars.com/vehicledetail/4f3cb85a-3b57-4618-807b-91ce9c320207/
+https://www.cars.com/vehicledetail/7f23716d-db91-4cab-8c25-c4f30c08924f/
+https://www.cars.com/vehicledetail/87de85a1-876b-4105-b9bd-1d4601fe519c/
+https://www.cars.com/vehicledetail/b2049e6f-94e9-467f-a64a-9ca0654e59b6/
+https://www.cars.com/vehicledetail/fe340fd9-dc7c-4768-96a7-2d1358e590c3/
+https://www.cars.com/vehicledetail/556c40d3-a0be-4452-b4e2-7d5488c61282/
+https://www.cars.com/vehicledetail/a50214cf-aabb-4634-8138-3cba1b2f8960/
+https://www.cars.com/vehicledetail/33052353-c86c-43fb-9716-c05b1cc0ca8e/
+https://www.cars.com/vehicledetail/46359e77-256b-4053-a79b-362021a4730e/
+time: 00:02:34, card: 93, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:02:34, card: 94, year: 2023: https://www.cars.com/vehicledetail/77de13af-46b7-4c01-acf4-509b2339bd26/
+time: 00:02:36, card: 95, year: 2023: https://www.cars.com/vehicledetail/fa71a7ec-a5ec-420e-8ffa-0a80000e4463/
+time: 00:02:38, card: 96, year: 2023: https://www.cars.com/vehicledetail/1f9b3c8b-5e4b-4dc8-9f29-8aff15b258bb/
+time: 00:02:40, card: 97, year: 2023: https://www.cars.com/vehicledetail/48ea690a-d9e7-43ee-a931-5fc343654717/
+time: 00:02:41, card: 98, year: 2023: https://www.cars.com/vehicledetail/80cc7b0e-0353-4c8a-aab9-7b929c98ab8d/
+time: 00:02:43, card: 99, year: 2023: https://www.cars.com/vehicledetail/cd4fec88-0dd2-4d57-9b1e-1f8280a4e1a4/
+time: 00:02:44, card: 100, year: 2023: https://www.cars.com/vehicledetail/5224a828-d933-4a5d-9a93-c6abd319b1c0/
+time: 00:02:46, card: 101, year: 2023: https://www.cars.com/vehicledetail/c090ca1e-5aea-480f-94bf-a1e7ff7496db/
+time: 00:02:47, card: 102, year: 2023: https://www.cars.com/vehicledetail/5b22aaba-937a-4777-a6dc-756d493859af/
+time: 00:02:49, card: 103, year: 2023: https://www.cars.com/vehicledetail/a39b78d2-ce36-4473-9fb0-3ca9a705e32b/
+time: 00:02:51, card: 104, year: 2023: https://www.cars.com/vehicledetail/1ef7a36f-2e4e-42c2-bf57-193d7258b2b8/
+time: 00:02:52, card: 105, year: 2023: https://www.cars.com/vehicledetail/4f3cb85a-3b57-4618-807b-91ce9c320207/
+time: 00:02:54, card: 106, year: 2023: https://www.cars.com/vehicledetail/7f23716d-db91-4cab-8c25-c4f30c08924f/
+time: 00:02:56, card: 107, year: 2023: https://www.cars.com/vehicledetail/87de85a1-876b-4105-b9bd-1d4601fe519c/
+time: 00:02:58, card: 108, year: 2023: https://www.cars.com/vehicledetail/b2049e6f-94e9-467f-a64a-9ca0654e59b6/
+time: 00:03:00, card: 109, year: 2023: https://www.cars.com/vehicledetail/fe340fd9-dc7c-4768-96a7-2d1358e590c3/
+time: 00:03:01, card: 110, year: 2023: https://www.cars.com/vehicledetail/556c40d3-a0be-4452-b4e2-7d5488c61282/
+time: 00:03:03, card: 111, year: 2023: https://www.cars.com/vehicledetail/a50214cf-aabb-4634-8138-3cba1b2f8960/
+time: 00:03:05, card: 112, year: 2023: https://www.cars.com/vehicledetail/33052353-c86c-43fb-9716-c05b1cc0ca8e/
+time: 00:03:07, card: 113, year: 2023: https://www.cars.com/vehicledetail/46359e77-256b-4053-a79b-362021a4730e/
+
+time: 00:03:08, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=4&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/cb08172a-ca76-4ff3-9ee6-cdf818cb7d19/
+https://www.cars.com/vehicledetail/c50a21e3-e52d-4e5b-8ddd-19f38a7355be/
+https://www.cars.com/vehicledetail/cca6720f-4e87-4bdd-85f7-57aea274ca41/
+https://www.cars.com/vehicledetail/e7c7c93d-78fb-4965-b710-846852be47e8/
+https://www.cars.com/vehicledetail/11f91e71-f71c-40fa-aa21-db1b04dbc7ca/
+https://www.cars.com/vehicledetail/ce35b369-606a-431e-bb6d-8a42bd86a85f/
+https://www.cars.com/vehicledetail/aa21d0c8-5cf0-49a3-b59c-8c2d4b3c8184/
+https://www.cars.com/vehicledetail/2e26ebf7-616a-4596-93b0-0b45ce88dd3d/
+https://www.cars.com/vehicledetail/ceb6fbdc-ddcc-4c35-8107-a3d0d25fe51f/
+https://www.cars.com/vehicledetail/c688427b-abda-40a6-a05d-90cd12be79f8/
+https://www.cars.com/vehicledetail/103322ff-96e4-44a9-8be2-d1d8823f40c0/
+https://www.cars.com/vehicledetail/026a09d1-f9d4-42cc-8693-37baa849c90f/
+https://www.cars.com/vehicledetail/cab0af4f-5ac2-4be6-a243-37d0718ab618/
+https://www.cars.com/vehicledetail/658b0a35-e281-4a6c-9066-54caddd20437/
+https://www.cars.com/vehicledetail/70591cee-f1f2-437d-acd0-0949570ddb66/
+https://www.cars.com/vehicledetail/d89cfbce-65f2-400a-b687-dc402f48f6f9/
+https://www.cars.com/vehicledetail/38fda789-ca99-412c-b235-40f807554948/
+https://www.cars.com/vehicledetail/ca00d500-416a-40fb-aae1-45e3267b6797/
+https://www.cars.com/vehicledetail/89af7ee4-f71b-4ea3-99be-74bfac82cf80/
+https://www.cars.com/vehicledetail/01735b0f-5e22-40d2-8aaa-e9c7e186b211/
+time: 00:03:10, card: 114, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:03:10, card: 115, year: 2023: https://www.cars.com/vehicledetail/cb08172a-ca76-4ff3-9ee6-cdf818cb7d19/
+time: 00:03:11, card: 116, year: 2023: https://www.cars.com/vehicledetail/c50a21e3-e52d-4e5b-8ddd-19f38a7355be/
+time: 00:03:13, card: 117, year: 2023: https://www.cars.com/vehicledetail/cca6720f-4e87-4bdd-85f7-57aea274ca41/
+time: 00:03:15, card: 118, year: 2023: https://www.cars.com/vehicledetail/e7c7c93d-78fb-4965-b710-846852be47e8/
+time: 00:03:16, card: 119, year: 2023: https://www.cars.com/vehicledetail/11f91e71-f71c-40fa-aa21-db1b04dbc7ca/
+time: 00:03:19, card: 120, year: 2023: https://www.cars.com/vehicledetail/ce35b369-606a-431e-bb6d-8a42bd86a85f/
+time: 00:03:21, card: 121, year: 2023: https://www.cars.com/vehicledetail/aa21d0c8-5cf0-49a3-b59c-8c2d4b3c8184/
+time: 00:03:23, card: 122, year: 2023: https://www.cars.com/vehicledetail/2e26ebf7-616a-4596-93b0-0b45ce88dd3d/
+time: 00:03:24, card: 123, year: 2023: https://www.cars.com/vehicledetail/ceb6fbdc-ddcc-4c35-8107-a3d0d25fe51f/
+time: 00:03:26, card: 124, year: 2023: https://www.cars.com/vehicledetail/c688427b-abda-40a6-a05d-90cd12be79f8/
+time: 00:03:28, card: 125, year: 2023: https://www.cars.com/vehicledetail/103322ff-96e4-44a9-8be2-d1d8823f40c0/
+time: 00:03:29, card: 126, year: 2023: https://www.cars.com/vehicledetail/026a09d1-f9d4-42cc-8693-37baa849c90f/
+time: 00:03:31, card: 127, year: 2023: https://www.cars.com/vehicledetail/cab0af4f-5ac2-4be6-a243-37d0718ab618/
+time: 00:03:32, card: 128, year: 2023: https://www.cars.com/vehicledetail/658b0a35-e281-4a6c-9066-54caddd20437/
+time: 00:03:34, card: 129, year: 2023: https://www.cars.com/vehicledetail/70591cee-f1f2-437d-acd0-0949570ddb66/
+time: 00:03:35, card: 130, year: 2023: https://www.cars.com/vehicledetail/d89cfbce-65f2-400a-b687-dc402f48f6f9/
+time: 00:03:37, card: 131, year: 2023: https://www.cars.com/vehicledetail/38fda789-ca99-412c-b235-40f807554948/
+time: 00:03:39, card: 132, year: 2023: https://www.cars.com/vehicledetail/ca00d500-416a-40fb-aae1-45e3267b6797/
+time: 00:03:40, card: 133, year: 2023: https://www.cars.com/vehicledetail/89af7ee4-f71b-4ea3-99be-74bfac82cf80/
+time: 00:03:42, card: 134, year: 2023: https://www.cars.com/vehicledetail/01735b0f-5e22-40d2-8aaa-e9c7e186b211/
+
+time: 00:03:44, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=5&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/e5ac65fb-6a0f-4f14-bde2-194b71ad7f7c/
+https://www.cars.com/vehicledetail/2cf4e40f-1c38-4101-95e9-1d9620cc6b0f/
+https://www.cars.com/vehicledetail/0b77cb7a-b946-429a-a1e4-83b53d7c7550/
+https://www.cars.com/vehicledetail/ab571886-b63c-41d4-bb65-eab73607f1c0/
+https://www.cars.com/vehicledetail/57b29f56-b105-4f0e-85a9-285731b96608/
+https://www.cars.com/vehicledetail/759ab6b1-0cb5-4bf4-b0ef-ea93b1e1236c/
+https://www.cars.com/vehicledetail/a5f3bf1e-3c1c-41f4-bd75-a92f4204d730/
+https://www.cars.com/vehicledetail/39787f2f-ce25-4fae-a92b-1bbdc76653c4/
+https://www.cars.com/vehicledetail/39744b71-1411-4a72-80ca-0fa8ee81ccfa/
+https://www.cars.com/vehicledetail/b9c7fd77-a1c9-4137-87cd-e3f7bd48cbe5/
+https://www.cars.com/vehicledetail/0ba2d604-3952-4030-84ae-35ba024a4f5d/
+https://www.cars.com/vehicledetail/4edff73c-c1c8-423e-9429-8007f441fdca/
+https://www.cars.com/vehicledetail/430591cf-c4d7-4b35-90aa-a2c46037fd1a/
+https://www.cars.com/vehicledetail/0b6eb5bf-d499-4172-9b6e-5a142687b57c/
+https://www.cars.com/vehicledetail/06002b04-d10d-42c5-894e-1f68f43a1032/
+https://www.cars.com/vehicledetail/6dbb0720-41be-435c-8193-8916fb5cbd0d/
+https://www.cars.com/vehicledetail/f65ad2f5-fbbf-4c04-9d2d-ce39e6e4f17f/
+https://www.cars.com/vehicledetail/39676e7b-b5bb-4d2d-b45a-9b971b2bf583/
+https://www.cars.com/vehicledetail/e9f2b3c2-1bc8-470c-854f-76730a17a124/
+https://www.cars.com/vehicledetail/c7b5a9a2-baa3-4316-845a-8fd2a0b3df06/
+time: 00:03:45, card: 135, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:03:45, card: 136, year: 2023: https://www.cars.com/vehicledetail/e5ac65fb-6a0f-4f14-bde2-194b71ad7f7c/
+time: 00:03:47, card: 137, year: 2023: https://www.cars.com/vehicledetail/2cf4e40f-1c38-4101-95e9-1d9620cc6b0f/
+time: 00:03:48, card: 138, year: 2023: https://www.cars.com/vehicledetail/0b77cb7a-b946-429a-a1e4-83b53d7c7550/
+time: 00:03:50, card: 139, year: 2023: https://www.cars.com/vehicledetail/ab571886-b63c-41d4-bb65-eab73607f1c0/
+time: 00:03:51, card: 140, year: 2023: https://www.cars.com/vehicledetail/57b29f56-b105-4f0e-85a9-285731b96608/
+time: 00:03:53, card: 141, year: 2023: https://www.cars.com/vehicledetail/759ab6b1-0cb5-4bf4-b0ef-ea93b1e1236c/
+time: 00:03:54, card: 142, year: 2023: https://www.cars.com/vehicledetail/a5f3bf1e-3c1c-41f4-bd75-a92f4204d730/
+time: 00:03:56, card: 143, year: 2023: https://www.cars.com/vehicledetail/39787f2f-ce25-4fae-a92b-1bbdc76653c4/
+time: 00:03:58, card: 144, year: 2023: https://www.cars.com/vehicledetail/39744b71-1411-4a72-80ca-0fa8ee81ccfa/
+time: 00:03:59, card: 145, year: 2023: https://www.cars.com/vehicledetail/b9c7fd77-a1c9-4137-87cd-e3f7bd48cbe5/
+time: 00:04:01, card: 146, year: 2023: https://www.cars.com/vehicledetail/0ba2d604-3952-4030-84ae-35ba024a4f5d/
+time: 00:04:03, card: 147, year: 2023: https://www.cars.com/vehicledetail/4edff73c-c1c8-423e-9429-8007f441fdca/
+time: 00:04:05, card: 148, year: 2023: https://www.cars.com/vehicledetail/430591cf-c4d7-4b35-90aa-a2c46037fd1a/
+time: 00:04:07, card: 149, year: 2023: https://www.cars.com/vehicledetail/0b6eb5bf-d499-4172-9b6e-5a142687b57c/
+time: 00:04:08, card: 150, year: 2023: https://www.cars.com/vehicledetail/06002b04-d10d-42c5-894e-1f68f43a1032/
+time: 00:04:10, card: 151, year: 2023: https://www.cars.com/vehicledetail/6dbb0720-41be-435c-8193-8916fb5cbd0d/
+time: 00:04:12, card: 152, year: 2023: https://www.cars.com/vehicledetail/f65ad2f5-fbbf-4c04-9d2d-ce39e6e4f17f/
+time: 00:04:14, card: 153, year: 2023: https://www.cars.com/vehicledetail/39676e7b-b5bb-4d2d-b45a-9b971b2bf583/
+time: 00:04:15, card: 154, year: 2023: https://www.cars.com/vehicledetail/e9f2b3c2-1bc8-470c-854f-76730a17a124/
+time: 00:04:17, card: 155, year: 2023: https://www.cars.com/vehicledetail/c7b5a9a2-baa3-4316-845a-8fd2a0b3df06/
+
+time: 00:04:18, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=6&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/f76967d6-6042-4f56-951c-a2390533297f/
+https://www.cars.com/vehicledetail/78ad8ac4-5e9d-452d-b601-b4adf478cf4c/
+https://www.cars.com/vehicledetail/c52a2c59-7ae7-457a-b5b2-758fa32ade78/
+https://www.cars.com/vehicledetail/405626b4-0b5c-4d86-b1b8-d45b3ee8f3bc/
+https://www.cars.com/vehicledetail/622ebd75-a073-47ca-9257-d3d63253169b/
+https://www.cars.com/vehicledetail/82786ab2-985b-490e-bfd7-4cc80f0904cb/
+https://www.cars.com/vehicledetail/7856892e-0e33-4977-b647-b8db6e224069/
+https://www.cars.com/vehicledetail/9555005d-0385-46b3-9d6a-b6c93835455b/
+https://www.cars.com/vehicledetail/073152c0-3489-4f42-ac06-21bb40b7a20c/
+https://www.cars.com/vehicledetail/6bd83f01-cc94-4f93-b1a1-02aae736ea37/
+https://www.cars.com/vehicledetail/03f9c61a-6a84-40bf-a930-b05dc8023d3b/
+https://www.cars.com/vehicledetail/6b30a495-f201-45ae-a006-c5f736d1f381/
+https://www.cars.com/vehicledetail/c032140b-5a16-4910-b3e2-9af2291db9be/
+https://www.cars.com/vehicledetail/9ffc24c8-f814-4fcb-9529-b39db06c538a/
+https://www.cars.com/vehicledetail/ea9fd9b5-ceeb-4ef4-87ad-49de0c048469/
+https://www.cars.com/vehicledetail/ba539ff1-4c7d-42e9-a6ee-31685513ce1d/
+https://www.cars.com/vehicledetail/e9f99abc-efe9-40f6-92a1-16830cbe2a40/
+https://www.cars.com/vehicledetail/1d59fcb7-926e-4bf2-aaa3-9850ea26161b/
+https://www.cars.com/vehicledetail/bc747803-4145-4fce-bb54-c9f36d41d1f1/
+https://www.cars.com/vehicledetail/e0213546-769b-49a1-ab0e-20bc5b18a3ad/
+time: 00:04:20, card: 156, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:04:20, card: 157, year: 2023: https://www.cars.com/vehicledetail/f76967d6-6042-4f56-951c-a2390533297f/
+time: 00:04:22, card: 158, year: 2023: https://www.cars.com/vehicledetail/78ad8ac4-5e9d-452d-b601-b4adf478cf4c/
+time: 00:04:24, card: 159, year: 2023: https://www.cars.com/vehicledetail/c52a2c59-7ae7-457a-b5b2-758fa32ade78/
+time: 00:04:25, card: 160, year: 2023: https://www.cars.com/vehicledetail/405626b4-0b5c-4d86-b1b8-d45b3ee8f3bc/
+time: 00:04:27, card: 161, year: 2023: https://www.cars.com/vehicledetail/622ebd75-a073-47ca-9257-d3d63253169b/
+time: 00:04:30, card: 162, year: 2023: https://www.cars.com/vehicledetail/82786ab2-985b-490e-bfd7-4cc80f0904cb/
+time: 00:04:33, card: 163, year: 2023: https://www.cars.com/vehicledetail/7856892e-0e33-4977-b647-b8db6e224069/
+time: 00:04:34, card: 164, year: 2023: https://www.cars.com/vehicledetail/9555005d-0385-46b3-9d6a-b6c93835455b/
+time: 00:04:37, card: 165, year: 2023: https://www.cars.com/vehicledetail/073152c0-3489-4f42-ac06-21bb40b7a20c/
+time: 00:04:40, card: 166, year: 2023: https://www.cars.com/vehicledetail/6bd83f01-cc94-4f93-b1a1-02aae736ea37/
+time: 00:04:42, card: 167, year: 2023: https://www.cars.com/vehicledetail/03f9c61a-6a84-40bf-a930-b05dc8023d3b/
+time: 00:04:45, card: 168, year: 2023: https://www.cars.com/vehicledetail/6b30a495-f201-45ae-a006-c5f736d1f381/
+time: 00:04:47, card: 169, year: 2023: https://www.cars.com/vehicledetail/c032140b-5a16-4910-b3e2-9af2291db9be/
+time: 00:04:48, card: 170, year: 2023: https://www.cars.com/vehicledetail/9ffc24c8-f814-4fcb-9529-b39db06c538a/
+time: 00:04:50, card: 171, year: 2023: https://www.cars.com/vehicledetail/ea9fd9b5-ceeb-4ef4-87ad-49de0c048469/
+time: 00:04:52, card: 172, year: 2023: https://www.cars.com/vehicledetail/ba539ff1-4c7d-42e9-a6ee-31685513ce1d/
+time: 00:04:56, card: 173, year: 2023: https://www.cars.com/vehicledetail/e9f99abc-efe9-40f6-92a1-16830cbe2a40/
+time: 00:04:58, card: 174, year: 2023: https://www.cars.com/vehicledetail/1d59fcb7-926e-4bf2-aaa3-9850ea26161b/
+time: 00:05:00, card: 175, year: 2023: https://www.cars.com/vehicledetail/bc747803-4145-4fce-bb54-c9f36d41d1f1/
+time: 00:05:02, card: 176, year: 2023: https://www.cars.com/vehicledetail/e0213546-769b-49a1-ab0e-20bc5b18a3ad/
+
+time: 00:05:04, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=7&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/cd7e7443-51af-4a4a-964a-7abb7d750ab8/
+https://www.cars.com/vehicledetail/909c2b9c-68e6-435e-b2da-87c247ad6309/
+https://www.cars.com/vehicledetail/d34383ee-f6da-400e-9890-293b181f4608/
+https://www.cars.com/vehicledetail/f54a2337-e4b0-4b2c-9cce-d614441b1a63/
+https://www.cars.com/vehicledetail/f2f1a2b9-9a1d-438e-87d1-fc175c361df8/
+https://www.cars.com/vehicledetail/26816667-0f4c-4541-b18f-6ca2be3b4902/
+https://www.cars.com/vehicledetail/3f59e89a-f2de-4035-8029-40f826ea9968/
+https://www.cars.com/vehicledetail/2847354d-c8e0-400f-a9d9-34d7a0fe60f9/
+https://www.cars.com/vehicledetail/00493b1b-4e7f-4821-9f85-2e04bd65a635/
+https://www.cars.com/vehicledetail/6e966dee-8676-461f-89b1-c86377ed6b94/
+https://www.cars.com/vehicledetail/36e47116-e0fe-4e1a-b3f0-2801a8c8a58d/
+https://www.cars.com/vehicledetail/f9467151-e159-4b17-9715-f4656d96118b/
+https://www.cars.com/vehicledetail/96f667ae-e4d0-4660-ac22-6315945bc294/
+https://www.cars.com/vehicledetail/267ff099-4498-435c-95de-f681f1cfdbee/
+https://www.cars.com/vehicledetail/551af611-ef9b-4c91-8e2c-9da91aa2eedb/
+https://www.cars.com/vehicledetail/0eff35bf-55a4-4d80-81a0-4e9f85873a5c/
+https://www.cars.com/vehicledetail/368bcfb2-3ff9-4c54-b03a-12726d77a7d6/
+https://www.cars.com/vehicledetail/3c18a3cb-facc-45f2-a5b7-6fc8095b5106/
+https://www.cars.com/vehicledetail/9b957fcc-a494-4906-a529-fef44188a60e/
+https://www.cars.com/vehicledetail/be1d92ac-9ac8-4b12-b5de-c375b56e426d/
+time: 00:05:06, card: 177, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:05:06, card: 178, year: 2023: https://www.cars.com/vehicledetail/cd7e7443-51af-4a4a-964a-7abb7d750ab8/
+time: 00:05:08, card: 179, year: 2023: https://www.cars.com/vehicledetail/909c2b9c-68e6-435e-b2da-87c247ad6309/
+time: 00:05:10, card: 180, year: 2023: https://www.cars.com/vehicledetail/d34383ee-f6da-400e-9890-293b181f4608/
+time: 00:05:12, card: 181, year: 2023: https://www.cars.com/vehicledetail/f54a2337-e4b0-4b2c-9cce-d614441b1a63/
+time: 00:05:15, card: 182, year: 2023: https://www.cars.com/vehicledetail/f2f1a2b9-9a1d-438e-87d1-fc175c361df8/
+time: 00:05:17, card: 183, year: 2023: https://www.cars.com/vehicledetail/26816667-0f4c-4541-b18f-6ca2be3b4902/
+time: 00:05:19, card: 184, year: 2023: https://www.cars.com/vehicledetail/3f59e89a-f2de-4035-8029-40f826ea9968/
+time: 00:05:20, card: 185, year: 2023: https://www.cars.com/vehicledetail/2847354d-c8e0-400f-a9d9-34d7a0fe60f9/
+time: 00:05:22, card: 186, year: 2023: https://www.cars.com/vehicledetail/00493b1b-4e7f-4821-9f85-2e04bd65a635/
+time: 00:05:24, card: 187, year: 2023: https://www.cars.com/vehicledetail/6e966dee-8676-461f-89b1-c86377ed6b94/
+time: 00:05:26, card: 188, year: 2023: https://www.cars.com/vehicledetail/36e47116-e0fe-4e1a-b3f0-2801a8c8a58d/
+time: 00:05:27, card: 189, year: 2023: https://www.cars.com/vehicledetail/f9467151-e159-4b17-9715-f4656d96118b/
+time: 00:05:30, card: 190, year: 2023: https://www.cars.com/vehicledetail/96f667ae-e4d0-4660-ac22-6315945bc294/
+time: 00:05:32, card: 191, year: 2023: https://www.cars.com/vehicledetail/267ff099-4498-435c-95de-f681f1cfdbee/
+time: 00:05:35, card: 192, year: 2023: https://www.cars.com/vehicledetail/551af611-ef9b-4c91-8e2c-9da91aa2eedb/
+time: 00:05:37, card: 193, year: 2023: https://www.cars.com/vehicledetail/0eff35bf-55a4-4d80-81a0-4e9f85873a5c/
+time: 00:05:38, card: 194, year: 2023: https://www.cars.com/vehicledetail/368bcfb2-3ff9-4c54-b03a-12726d77a7d6/
+time: 00:05:41, card: 195, year: 2023: https://www.cars.com/vehicledetail/3c18a3cb-facc-45f2-a5b7-6fc8095b5106/
+time: 00:05:43, card: 196, year: 2023: https://www.cars.com/vehicledetail/9b957fcc-a494-4906-a529-fef44188a60e/
+time: 00:05:45, card: 197, year: 2023: https://www.cars.com/vehicledetail/be1d92ac-9ac8-4b12-b5de-c375b56e426d/
+
+time: 00:05:46, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=8&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/7a00901b-2c40-46c6-beaf-8b2fd52dc982/
+https://www.cars.com/vehicledetail/5d92c7a8-8f0f-43b9-93a3-ca18ffcab50c/
+https://www.cars.com/vehicledetail/89c52783-ee70-4d06-a1c9-3a9dba9d2cb1/
+https://www.cars.com/vehicledetail/ac92796a-e488-4246-b0d7-3ace9cafb83a/
+https://www.cars.com/vehicledetail/9f12a467-2a8c-40c4-ab1b-19fa88e911b5/
+https://www.cars.com/vehicledetail/ddc62ca6-bfbb-44f8-9cbf-9c8b8bab2b47/
+https://www.cars.com/vehicledetail/e1f4178f-8574-4231-ba2e-d6337a07bd7a/
+https://www.cars.com/vehicledetail/4624e5db-f46c-42a1-a584-a9a80b1eaef6/
+https://www.cars.com/vehicledetail/cbeb319f-dd74-48f4-8faa-b9dec6562637/
+https://www.cars.com/vehicledetail/8598b132-4639-479b-89a3-5c7c02b15dba/
+https://www.cars.com/vehicledetail/3f3e80a5-5424-4df5-a0dd-c4a65863b447/
+https://www.cars.com/vehicledetail/c9aaa771-70e1-45ce-b575-9f84e5f5b170/
+https://www.cars.com/vehicledetail/2613c38b-c73a-458e-9604-f6abb28d6769/
+https://www.cars.com/vehicledetail/ac6f6048-6b0b-49c3-b9b0-73ff7a6eab9f/
+https://www.cars.com/vehicledetail/56bf9081-b3fe-4458-b879-caa4d7391bc6/
+https://www.cars.com/vehicledetail/06a5e283-6bd6-4c76-ad79-4baad3859e34/
+https://www.cars.com/vehicledetail/ea166109-eea6-439d-99a5-4ccac19e96db/
+https://www.cars.com/vehicledetail/04a27de5-acdc-4f4e-837b-845be77cdf7c/
+https://www.cars.com/vehicledetail/525e16d0-d0d0-4677-81b8-22b29e770387/
+https://www.cars.com/vehicledetail/fb7bd694-53c5-4650-b522-3322170c9411/
+time: 00:05:49, card: 198, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:05:49, card: 199, year: 2023: https://www.cars.com/vehicledetail/7a00901b-2c40-46c6-beaf-8b2fd52dc982/
+time: 00:05:51, card: 200, year: 2023: https://www.cars.com/vehicledetail/5d92c7a8-8f0f-43b9-93a3-ca18ffcab50c/
+time: 00:05:52, card: 201, year: 2023: https://www.cars.com/vehicledetail/89c52783-ee70-4d06-a1c9-3a9dba9d2cb1/
+time: 00:05:54, card: 202, year: 2023: https://www.cars.com/vehicledetail/ac92796a-e488-4246-b0d7-3ace9cafb83a/
+time: 00:05:56, card: 203, year: 2023: https://www.cars.com/vehicledetail/9f12a467-2a8c-40c4-ab1b-19fa88e911b5/
+time: 00:05:58, card: 204, year: 2023: https://www.cars.com/vehicledetail/ddc62ca6-bfbb-44f8-9cbf-9c8b8bab2b47/
+time: 00:06:00, card: 205, year: 2023: https://www.cars.com/vehicledetail/e1f4178f-8574-4231-ba2e-d6337a07bd7a/
+time: 00:06:02, card: 206, year: 2023: https://www.cars.com/vehicledetail/4624e5db-f46c-42a1-a584-a9a80b1eaef6/
+time: 00:06:07, card: 207, year: 2023: https://www.cars.com/vehicledetail/cbeb319f-dd74-48f4-8faa-b9dec6562637/
+time: 00:06:08, card: 208, year: 2023: https://www.cars.com/vehicledetail/8598b132-4639-479b-89a3-5c7c02b15dba/
+time: 00:06:10, card: 209, year: 2023: https://www.cars.com/vehicledetail/3f3e80a5-5424-4df5-a0dd-c4a65863b447/
+time: 00:06:11, card: 210, year: 2023: https://www.cars.com/vehicledetail/c9aaa771-70e1-45ce-b575-9f84e5f5b170/
+time: 00:06:13, card: 211, year: 2023: https://www.cars.com/vehicledetail/2613c38b-c73a-458e-9604-f6abb28d6769/
+time: 00:06:15, card: 212, year: 2023: https://www.cars.com/vehicledetail/ac6f6048-6b0b-49c3-b9b0-73ff7a6eab9f/
+time: 00:06:17, card: 213, year: 2023: https://www.cars.com/vehicledetail/56bf9081-b3fe-4458-b879-caa4d7391bc6/
+time: 00:06:18, card: 214, year: 2023: https://www.cars.com/vehicledetail/06a5e283-6bd6-4c76-ad79-4baad3859e34/
+time: 00:06:21, card: 215, year: 2023: https://www.cars.com/vehicledetail/ea166109-eea6-439d-99a5-4ccac19e96db/
+time: 00:06:23, card: 216, year: 2023: https://www.cars.com/vehicledetail/04a27de5-acdc-4f4e-837b-845be77cdf7c/
+time: 00:06:25, card: 217, year: 2023: https://www.cars.com/vehicledetail/525e16d0-d0d0-4677-81b8-22b29e770387/
+time: 00:06:27, card: 218, year: 2023: https://www.cars.com/vehicledetail/fb7bd694-53c5-4650-b522-3322170c9411/
+
+time: 00:06:29, url: https://www.cars.com/shopping/results/?list_price_max=29999&list_price_min=20000&maximum_distance=all&page_size=20&page=9&stock_type=used&year_max=2023&year_min=2023&zip=60606
+https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+https://www.cars.com/vehicledetail/7820af7e-1f96-43a5-ba67-76d2f80a6f16/
+https://www.cars.com/vehicledetail/cf9cfdfa-fcc3-43fa-a241-1fca10ad9de5/
+https://www.cars.com/vehicledetail/bcdf3c26-c581-47d3-952d-0d6fb824abe8/
+https://www.cars.com/vehicledetail/bd8587e7-5bc5-40bd-81ca-762a08371f59/
+https://www.cars.com/vehicledetail/e0c7144a-e0ad-4d8f-bf45-321286699b02/
+https://www.cars.com/vehicledetail/d8439662-a445-4cf1-8ca0-0ada44d7a570/
+https://www.cars.com/vehicledetail/15c4afcb-1c4f-4bbe-8c36-5b0f10375dad/
+https://www.cars.com/vehicledetail/a501feec-db4e-4aab-bdf2-b09542a5fd4a/
+https://www.cars.com/vehicledetail/7c78b85b-cef8-4b6f-a032-c87cc9b4e790/
+https://www.cars.com/vehicledetail/0376e365-b35b-4011-be8b-64b775517ae3/
+https://www.cars.com/vehicledetail/4d1d4820-eeef-470f-9aed-a2d3ec2b3e5f/
+https://www.cars.com/vehicledetail/1f8b4bdf-fa96-40d7-af08-57b199773653/
+https://www.cars.com/vehicledetail/94f139bb-123a-41e6-aeea-1769f6e36818/
+https://www.cars.com/vehicledetail/b173c297-ce87-477e-901c-0298d90a9979/
+https://www.cars.com/vehicledetail/bc652299-4aa9-47bc-9bb7-131a308c93db/
+https://www.cars.com/vehicledetail/f88e5042-445b-4ac4-8792-584c170d5a96/
+https://www.cars.com/vehicledetail/85f533aa-31c3-41a2-8aee-b49d519284bd/
+https://www.cars.com/vehicledetail/d8a51b2d-0af6-4eab-a5bc-1f8683c55e16/
+https://www.cars.com/vehicledetail/5c497a00-333f-48e7-b602-1e0b33bdefab/
+https://www.cars.com/vehicledetail/a25218c9-f650-4a80-b6f6-dcadbafedd17/
+time: 00:06:30, card: 219, year: 2023: https://www.cars.com/vehicledetail/bea47170-9392-41d8-aad8-f4639557f305/?attribution_type=premier
+time: 00:06:30, card: 220, year: 2023: https://www.cars.com/vehicledetail/7820af7e-1f96-43a5-ba67-76d2f80a6f16/
+time: 00:06:32, card: 221, year: 2023: https://www.cars.com/vehicledetail/cf9cfdfa-fcc3-43fa-a241-1fca10ad9de5/
+time: 00:06:33, card: 222, year: 2023: https://www.cars.com/vehicledetail/bcdf3c26-c581-47d3-952d-0d6fb824abe8/

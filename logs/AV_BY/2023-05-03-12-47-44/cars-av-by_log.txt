@@ -1,0 +1,28 @@
+start time (GMT): 12:47:44
+
+time: 00:00:00, url: https://cars.av.by/filter?year[min]=2023&year[max]=2023&price_usd[min]=0&price_usd[max]=9999&page=1
+time: 00:00:00, no cards found
+
+time: 00:00:00, url: https://cars.av.by/filter?year[min]=2023&year[max]=2023&price_usd[min]=10000&price_usd[max]=19999&page=1
+time: 00:00:01, card: 1, year: 2023: https://cars.av.by/lada-vaz/2121-niva/104309289
+time: 00:00:02, card: 2, year: 2023: https://cars.av.by/geely/emgrand/104324664
+
+time: 00:00:02, url: https://cars.av.by/filter?year[min]=2023&year[max]=2023&price_usd[min]=10000&price_usd[max]=19999&page=2
+time: 00:00:03, no cards found
+
+time: 00:00:03, url: https://cars.av.by/filter?year[min]=2023&year[max]=2023&price_usd[min]=20000&price_usd[max]=29999&page=1
+time: 00:00:04, card: 3, year: 2023: https://cars.av.by/geely/emgrand/104422519
+time: 00:00:04, card: 4, year: 2023: https://cars.av.by/geely/atlas-pro/104277078
+time: 00:00:04, card: 5, year: 2023: https://cars.av.by/geely/coolray/104313870
+time: 00:00:05, card: 6, year: 2023: https://cars.av.by/jac/js4/104187872
+time: 00:00:06, card: 7, year: 2023: https://cars.av.by/jac/js4/104324096
+time: 00:00:07, card: 8, year: 2023: https://cars.av.by/jac/js4/104324093
+time: 00:00:07, card: 9, year: 2023: https://cars.av.by/jac/js4/104187874
+time: 00:00:08, card: 10, year: 2023: https://cars.av.by/faw/bestune-t77/104324135
+time: 00:00:09, card: 11, year: 2023: https://cars.av.by/jac/js4/104339543
+time: 00:00:09, card: 12, year: 2023: https://cars.av.by/jac/js4/104339540
+time: 00:00:10, card: 13, year: 2023: https://cars.av.by/jac/js4/104339533
+time: 00:00:11, card: 14, year: 2023: https://cars.av.by/faw/bestune-t77/104324219
+time: 00:00:11, card: 15, year: 2023: https://cars.av.by/jac/js4/104324101
+time: 00:00:12, card: 16, year: 2023: https://cars.av.by/jac/js4/104339546
+time: 00:00:13, card: 17, year: 2023: https://cars.av.by/jac/js4/104339547

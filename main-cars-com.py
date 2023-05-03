@@ -38,7 +38,7 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
         card = soup.find("section", class_="listing-overview")
         # print(card,"\n")
         if card == None:
-            return card_dict # {} - empty result
+            return {} # {} - empty result
 
         card_gallery = card.find("div", class_="modal-slides-and-controls")
         card_dict["gallery"] = []
@@ -59,8 +59,10 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
             card_dict[key.lower()] = value
 
         card_dict["card_id"] = card_dict.get("stock #")
-        if not card_dict["card_id"]:
+        if not card_dict["card_id"] or card_dict["card_id"] == "-":
             card_dict["card_id"] = card_dict.get("vin")
+        if not card_dict["card_id"] or card_dict["card_id"] == "-":
+            return {}
 
         card_dict["url"] = url
 
@@ -215,8 +217,8 @@ def make_folder(start_folder, subfolders_chain):
     return folder
 
 def main():
-    make_folder(f"{os.curdir}", ["scrapped_cards", "CARS_COM", "JSON", start_time_str])
-    make_folder(f"{os.curdir}", ["scrapped_cards", "CARS_COM", "CSV", start_time_str])
+    make_folder(f"{os.curdir}", ["scrapped_data", "CARS_COM", "JSON", start_time_str])
+    make_folder(f"{os.curdir}", ["scrapped_data", "CARS_COM", "CSV", start_time_str])
     make_folder(f"{os.curdir}", ["logs", "CARS_COM", start_time_str])
 
     with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file:
@@ -263,7 +265,7 @@ def main():
                         card_id = parsed_card["card_id"]
 
                         folder = make_folder(f"{os.curdir}",
-                                             ["scrapped_cards", "CARS_COM", "JSON",
+                                             ["scrapped_data", "CARS_COM", "JSON",
                                               f"{start_time_str}",
                                               f"{year}",
                                               f"price_{price_usd}-{price_usd + 9999}"])

@@ -1,11 +1,13 @@
 import os
+import time
 
 from pyspark.sql import SparkSession
-from pyspark.sql.types import ArrayType, StringType, StructType
-from pyspark.sql.functions import input_file_name
+from pyspark.sql.types import ArrayType, StringType, TimestampType, StructType
+from pyspark.sql.functions import input_file_name, current_timestamp, lit
 
-DEBUG_MODE = True        #instead of a hardcoded value, in future it'll become a console argument
+DEBUG_MODE = True        # instead of a hardcoded value, in future it'll become a config parameter
 DEBUG_TOKENIZED_ATTRS = True
+ARCHIVE_SOURCE_FILES = True
 
 spark = SparkSession.builder.master("local[*]").appName('car ads batch ETL (source to DL)') \
     .config('spark.driver.extraJavaOptions', '-Duser.timezone=GMT') \
@@ -13,8 +15,12 @@ spark = SparkSession.builder.master("local[*]").appName('car ads batch ETL (sour
     .config('spark.sql.session.timeZone', 'UTC') \
     .config("spark.ui.port", "4041") \
     .config("spark.sql.parser.escapedStringLiterals", True) \
+    .config("spark.sql.files.openCostInBytes", "50000") \
+    .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 100) \
+    .config("spark.executor.memory", "700m") \
     .getOrCreate()
-# sc.setLogLevel(newLevel)
+# about partitioning in Spark: https://medium.com/swlh/building-partitions-for-processing-data-files-in-apache-spark-2ca40209c9b7
+
 
 def make_folder(start_folder, subfolders_chain):
     folder = start_folder
@@ -35,31 +41,33 @@ def create_input_df():
         .add("title", StringType(), False) \
         .add("price_primary", StringType(), False) \
         .add("price_history", StringType(), False) \
-        .add("options", ArrayType( \
-        StructType() \
-            .add("category", StringType(), False) \
-            .add("items", ArrayType(StringType())) \
+        .add("options", ArrayType(
+            StructType()
+                .add("category", StringType(), False)
+                .add("items", ArrayType(StringType()))
         )) \
         .add("vehicle_history", StringType(), False) \
         .add("comment", StringType(), False) \
         .add("location", StringType(), False) \
         .add("labels", StringType(), False) \
         .add("description", StringType(), False) \
-        .add("scrap_date", StringType(), False)
+        .add("scrap_date", TimestampType(), False)
 
-    # print(os.getcwd() + "/scrapped_cards/CARS_COM/JSON/*/*/*/")
-    #read source files - go through all the existing files
+    # print(os.getcwd() + "/scrapped_data/CARS_COM/JSON/*/*/*/")
+    # read source files - go through all the existing files
     source_df = spark \
         .read \
         .format("json") \
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", os.path.abspath(os.getcwd()) + "/scrapped_cards/CARS_COM/JSON/*/*/*/") \
+        .option("path", "scrapped_data/CARS_COM/JSON/*/*/*/") \
         .load() \
-        .withColumn("input_file_name", input_file_name())
-
+        .withColumn("input_file_name", input_file_name()) \
+        .withColumn("source_id", lit("cars.com scrapper")) \
+        .withColumn("dl_loaded_date", current_timestamp())
     return source_df
+
 
 def tokenize_data(df):
     # title: 2023 Hyundai Elantra SEL
@@ -70,7 +78,7 @@ def tokenize_data(df):
 
     df.createOrReplaceTempView("source_df")
 
-    transformed_df = spark.sql("""
+    tokenized_df = spark.sql("""
         select card_id,
                title,
                substring(title, -length(title)+5) as vehicle,
@@ -126,7 +134,7 @@ def tokenize_data(df):
                split(split(description, ', ')[4], ' [|] ')[1] as body,
                split(description, ', ')[5] as drive,
                split(description, ', ')[6] as color,
-               replace(comment, '\n', ' | ') as comment,
+               comment,
                vehicle_history,
                map_from_arrays(
                    regexp_extract_all(vehicle_history, '([^:]+): ([^|]+)[ ]?[|]?[ ]?', 1),
@@ -136,93 +144,193 @@ def tokenize_data(df):
                gallery,
                url,
                scrap_date,
-               regexp_replace(input_file_name, 'file:[/]+', '') as input_file_name,
-               replace(regexp_replace(input_file_name, 'file:[/]+', ''), 'scrapped_cards/', 'archived_cards/') as source_file_name,
-               current_timestamp() as loaded_date
+               source_id,
+               dl_loaded_date,
+               input_file_name as input_file_name,
+               replace(input_file_name, 'scrapped_data/', 'archived_data/') as source_file_name               
         from source_df
     """)
 
-    return transformed_df
+    return tokenized_df
 
 
-def clean_data(df):
+def clean_data(df, additional=None):
+    additional_actions = additional.split("|")
+
+    bad_data_df = df.where("""
+        trim(card_id) in ('', '–') or
+        trim(transmission) in ('', '–') or
+        trim(engine) in ('', '–') or
+        trim(drive) in ('', '–') or
+        milage in ('', '–')          
+    """)
+
+    if "archive_baddata_source_files" in additional_actions:
+        process_source_files(bad_data_df, dest_folder="bad_data", mode="archive_source_files")
+
+    if "delete_baddata_source_files" in additional_actions:
+        process_source_files(bad_data_df, dest_folder=None, mode="delete_source_files")
+
     return df.where("""
+            trim(card_id) not in ('', '–') and
             trim(transmission) not in ('', '–') and
             trim(engine) not in ('', '–') and
             trim(drive) not in ('', '–') and
-            milage not in ('', '–')
-    """)
+            milage not in ('', '–')          
+        """)
 
 
-def save_data(df):
-    df = df.repartition(1)
-    df.persist()
+def process_source_files(df, dest_folder, mode="archive_source_files"):
+    files_list = df.select("input_file_name").collect()
+
+    # archive already processed source files
+    for rec in files_list:
+        input_file = rec["input_file_name"]
+        if input_file.startswith("file:/"):
+            input_file = input_file.replace("file:/", "")
+            while input_file[0] == "/":
+                input_file = input_file[1:]
+
+            # in case of unix-like os lieve exactly one leading "/" symbol (to have a correct absolute path)
+            if os.name != "nt":
+                input_file = "/" + input_file
+
+        if mode == "delete_source_files":
+            os.remove(input_file)
+            continue
+
+        if mode == "archive_source_files":
+            archived_file = input_file.replace("scrapped_data/", f"{dest_folder}/")
+
+            folders_chain = archived_file.split("/")[:-1]
+
+            if os.name == "nt":
+                starting_folder = folders_chain[0]
+            else:
+                starting_folder = "/" + folders_chain[0]
+
+            try:
+                make_folder(starting_folder, folders_chain[1:])
+                if os.path.isfile(archived_file):
+                    os.remove(archived_file)
+                os.rename(input_file, archived_file)
+            except:
+                pass
+
+
+def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
+    # df = df.coalesce(8)
+    # df.persist()
 
     ETL_configs = [
         {
-            "ETL_desc": "debug info",
+            "ETL_desc": "debug info - card (direct)",
             "format": "console",
-            "attr_list": #"card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;loaded_date" \
-                    "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;description;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;scrap_date;source_file_name;loaded_date" \
-                    if DEBUG_TOKENIZED_ATTRS else \
-                         "card_id,title,price_primary,location,labels,description,scrap_date",
+            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;options;gallery;url;scrap_date;source_id;dl_loaded_date;input_file_name",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
-            "mode": "append",
+            "mode": "overwrite",
             "process": DEBUG_MODE
         },
         {
-            "ETL_desc": "card csv (direct)",
-            "format": "csv",
-            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;loaded_date",
+            "ETL_desc": "card (direct)",
+            "format": dest_format,
+            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;options;gallery;url;scrap_date;source_id;dl_loaded_date;input_file_name",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card"},
-            "mode": "append",
+            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card"},
+            "mode": "overwrite",
             "process": True
         },
         {
-            "ETL_desc": "card csv (tokenized)",
-            "format": "csv",
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_file_name;loaded_date",
+            "ETL_desc": "card",
+            "format": dest_format,
+            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_tokenized"},
-            "mode": "append",
+            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card"},
+            "mode": "overwrite",
             "process": True
         },
         {
-            "ETL_desc": "card_options csv",
-            "format": "csv",
-            "attr_list": "card_id;explode(options) as option_group;scrap_date;loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;loaded_date",
+            "ETL_desc": "debug info - card (tokenized)",
+            "format": "console",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "truncate": False},
+            "mode": "overwrite",
+            "process": DEBUG_MODE
+        },
+        {
+            "ETL_desc": "card (tokenized)",
+            "format": dest_format,
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            # "partitionBy": "year;price_range",
+            "partitionBy": "",
+            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_tokenized"},
+            "mode": "overwrite",
+            "process": True
+        },
+        {
+            "ETL_desc": "debug info - card_options",
+            "format": "console",
+            "attr_list": "card_id;explode(options) as option_group;scrap_date;source_id;dl_loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "category",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False, "path": "batch/CARS_COM/CSV/car_card_options"},
-            "mode": "append",
+            "options": {"header": True, "truncate": False},
+            "mode": "overwrite",
             "process": True
         },
         {
-            "ETL_desc": "card_info csv",
-            "format": "csv",
-            "attr_list": "card_id;url;source_file_name;scrap_date;loaded_date",
+            "ETL_desc": "card_options",
+            "format": dest_format,
+            "attr_list": "card_id;explode(options) as option_group;scrap_date;source_id;dl_loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;source_id;dl_loaded_date",
+            # "partitionBy": "category",
             "partitionBy": "",
-            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_info"},
-            "mode": "append",
+            "options": {"header": True, "truncate": False, "path": f"batch_data/CARS_COM/{dest_format}/car_card_options"},
+            "mode": "overwrite",
             "process": True
         },
         {
-            "ETL_desc": "card_gallery csv",
-            "format": "csv",
-            "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;loaded_date",
+            "ETL_desc": "debug info - card_info",
+            "format": "console",
+            "attr_list": "card_id;url;source_file_name;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": "batch/CARS_COM/CSV/car_card_gallery"},
-            "mode": "append",
+            "options": {"header": True, "truncate": False},
+            "mode": "overwrite",
+            "process": True
+        },
+        {
+            "ETL_desc": "card_info",
+            "format": dest_format,
+            "attr_list": "card_id;url;source_file_name;scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "truncate": False, "path": f"batch_data/CARS_COM/{dest_format}/car_card_info"},
+            "mode": "overwrite",
+            "process": True
+        },
+        {
+            "ETL_desc": "debug info - card_gallery",
+            "format": "console",
+            "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "truncate": False},
+            "mode": "overwrite",
+            "process": True
+        },
+        {
+            "ETL_desc": "card_gallery",
+            "format": dest_format,
+            "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_gallery"},
+            "mode": "overwrite",
             "process": True
         }
     ]
 
     for etl_config in ETL_configs:
-        if not etl_config["process"]:
+        if not etl_config["process"] or (etl_desc not in [None, "", '*'] and etl_config["ETL_desc"] not in etl_desc.split(";")):
             continue
 
         stage = df
@@ -237,23 +345,58 @@ def save_data(df):
         if etl_config["partitionBy"] != "":
             stage = stage.partitionBy(etl_config["partitionBy"].split(";"))
 
+        if etl_config["format"] == "console":
+            print(f"{etl_config['ETL_desc']}:")
+
         stage.save()
 
+    additional_actions = additional.split("|")
 
-    files_list = df.select("input_file_name", "source_file_name").collect()
+    if "archive_source_files" in additional_actions:
+        process_source_files(df, dest_folder="archived_data", mode="archive_source_files")
+    if "delete_source_files" in additional_actions:
+        process_source_files(df, dest_folder="archived_data", mode="delete_source_files")
+    if "reopen_df" in additional_actions:
+        # reopen source data - that time read from just saved file
+        df = spark \
+            .read \
+            .format(dest_format) \
+            .option("encoding", "UTF-8") \
+            .option("multiLine", True) \
+            .option("path", f"batch_data/CARS_COM/{dest_format}/car_card") \
+            .load()
 
-    df.unpersist()
+    # df.unpersist()
+
+    return df
 
 
 def main():
-    #extract
-    source_df = create_input_df()
-    #transform
-    tokenized_df = tokenize_data(source_df)
-    cleaned_df = clean_data(tokenized_df)
-    #load
-    save_data(cleaned_df)
+    # start_time = time.time()
 
+    # extract data from source files
+    source_df = create_input_df()
+
+    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
+    # load data without any processing but with new audit attributes added
+    source_df = save_data(source_df,
+                          etl_desc="debug info - card (direct);card (direct)",
+                          additional="reopen_df",
+                          dest_format="parquet")
+
+    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
+    # transform data
+    tokenized_df = tokenize_data(source_df)
+    cleaned_df = clean_data(tokenized_df, additional="archive_baddata_source_files")
+
+    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
+    # load tokenized & cleaned data
+    save_data(cleaned_df,
+              etl_desc="card;debug info - card (tokenized);card (tokenized);debug info - card_options;card_options;debug info - card_info;card_info;debug info - card_gallery;card_gallery",
+              additional="archive_source_files",
+              dest_format="csv")
+
+    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
 
 
 if __name__ == "__main__":

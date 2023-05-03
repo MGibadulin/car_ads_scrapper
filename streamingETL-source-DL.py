@@ -2,7 +2,7 @@ import os
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType, StringType, StructType
-from pyspark.sql.functions import input_file_name
+from pyspark.sql.functions import input_file_name, current_timestamp
 
 DEBUG_MODE = True        #instead of a hardcoded value, in future it'll become a console argument
 DEBUG_TOKENIZED_ATTRS = True
@@ -58,7 +58,8 @@ def create_input_file_stream():
         .option("multiLine", True) \
         .option("path", os.path.abspath(os.getcwd()) + "/scrapped_cards/CARS_COM/JSON/*/*/*/") \
         .load() \
-        .withColumn("input_file_name", input_file_name())
+        .withColumn("input_file_name", input_file_name()) \
+        .withColumn("loaded_date", current_timestamp())
 
     return source_df
 
@@ -127,7 +128,7 @@ def tokenize_stream_data(stream_df):
                split(split(description, ', ')[4], ' [|] ')[1] as body,
                split(description, ', ')[5] as drive,
                split(description, ', ')[6] as color,
-               comment,
+               regexp_replace(comment, '\n', '|') as comment,
                vehicle_history,
                map_from_arrays(
                    regexp_extract_all(vehicle_history, '([^:]+): ([^|]+)[ ]?[|]?[ ]?', 1),
@@ -137,9 +138,9 @@ def tokenize_stream_data(stream_df):
                gallery,
                url,
                scrap_date,
+               loaded_date,
                regexp_replace(input_file_name, 'file:[/]+', '') as input_file_name,
                replace(regexp_replace(input_file_name, 'file:[/]+', ''), 'scrapped_cards/', 'archived_cards/') as source_file_name,
-               current_timestamp() as loaded_date
         from source_micro_batch
     """)
 
@@ -148,6 +149,7 @@ def tokenize_stream_data(stream_df):
 
 def clean_stream_data(stream_df):
     return stream_df.where("""
+            trim(card_id) not in ('', '–') and
             trim(transmission) not in ('', '–') and
             trim(engine) not in ('', '–') and
             trim(drive) not in ('', '–') and
@@ -161,24 +163,34 @@ def save_batch_data(micro_batch_df, epoch_id):
 
     ETL_configs = [
         {
-
             "ETL_desc": "debug info",
             "format": "console",
-            "attr_list": #"card_id;vehicle;year;price;price_usd;location;labels;home_delivery;virtual_appointments;included_warranty;VIN;description;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;scrap_date;input_file_name;source_file_name" \
-                    "card_id;vehicle;year;price_range;price_primary;price_history;vehicle_history;vehicle_history_map;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;input_file_name" \
+            "attr_list":  # "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;loaded_date" \
+                "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;description;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;scrap_date;source_file_name;loaded_date" \
                     if DEBUG_TOKENIZED_ATTRS else \
-                         "card_id,title,price_primary,location,labels,description,scrap_date",
+                    "card_id,title,price_primary,location,labels,description,scrap_date",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "append",
             "process": DEBUG_MODE
         },
         {
-            "ETL_desc": "card csv",
+            "ETL_desc": "card csv (direct)",
             "format": "csv",
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;location;labels;transmission;engine;fuel;milage;body;drive;color;comment;scrap_date;loaded_date",
-            "partitionBy": "year;price_range",
+            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;current_timestamp() as loaded_date",
+            # "partitionBy": "year;price_range",
+            "partitionBy": "",
             "options": {"header": True, "path": "stream/CARS_COM/CSV/car_card"},
+            "mode": "append",
+            "process": True
+        },
+        {
+            "ETL_desc": "card csv (tokenized)",
+            "format": "csv",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_file_name;loaded_date",
+            # "partitionBy": "year;price_range",
+            "partitionBy": "",
+            "options": {"header": True, "path": "stream/CARS_COM/CSV/car_card_tokenized"},
             "mode": "append",
             "process": True
         },
@@ -186,7 +198,8 @@ def save_batch_data(micro_batch_df, epoch_id):
             "ETL_desc": "card_options csv",
             "format": "csv",
             "attr_list": "card_id;explode(options) as option_group;scrap_date;loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;loaded_date",
-            "partitionBy": "category",
+            # "partitionBy": "category",
+            "partitionBy": "",
             "options": {"header": True, "truncate": False, "path": "stream/CARS_COM/CSV/car_card_options"},
             "mode": "append",
             "process": True
@@ -229,12 +242,9 @@ def save_batch_data(micro_batch_df, epoch_id):
 
         stage.save()
 
-
     files_list = micro_batch_df.select("input_file_name", "source_file_name").collect()
 
-    micro_batch_df.unpersist()
-
-    #archive the already processed source files
+    #archive already processed source files
     for rec in files_list:
         input_file = rec["input_file_name"]     #.replace("file:/", "")
         archived_file = rec["source_file_name"] #input_file.replace("scrapped_cards/", "archived_cards/")
@@ -246,15 +256,17 @@ def save_batch_data(micro_batch_df, epoch_id):
         except:
             pass
 
+    micro_batch_df.unpersist()
+
 
 def main():
     #extract
-    source_df = create_input_file_stream()
+    source_stream_df = create_input_file_stream()
     #transform
-    tokenized_df = tokenize_stream_data(source_df)
+    tokenized_df = tokenize_stream_data(source_stream_df)
     cleaned_df = clean_stream_data(tokenized_df)
     #load
-    stream_df = cleaned_df \
+    output_stream_df = cleaned_df \
         .writeStream \
         .trigger(processingTime='3 seconds') \
         .option("checkpointLocation", "stream/checkpoints") \
@@ -263,7 +275,7 @@ def main():
         .foreachBatch(save_batch_data) \
         .start()
 
-    stream_df.awaitTermination()
+    output_stream_df.awaitTermination()
 
 
 if __name__ == "__main__":

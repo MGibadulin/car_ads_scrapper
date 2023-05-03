@@ -13,10 +13,10 @@ DEFAULT_HEADER = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1)
 
 SITE_URL = "https://cars.av.by"
 
-CSV_CARD_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card.csv"
-CSV_CARD_GALLERY_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_gallery.csv"
-CSV_CARD_OPTIONS_FILENAME_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_options.csv"
-CSV_CARD_URL_AV_BY = f"scrapped_cards/AV_BY/CSV/{start_time_str}/cars-av-by_card_url.csv"
+CSV_CARD_FILENAME_AV_BY = f"scrapped_data/AV_BY/CSV/{start_time_str}/cars-av-by_card.csv"
+CSV_CARD_GALLERY_FILENAME_AV_BY = f"scrapped_data/AV_BY/CSV/{start_time_str}/cars-av-by_card_gallery.csv"
+CSV_CARD_OPTIONS_FILENAME_AV_BY = f"scrapped_data/AV_BY/CSV/{start_time_str}/cars-av-by_card_options.csv"
+CSV_CARD_URL_AV_BY = f"scrapped_data/AV_BY/CSV/{start_time_str}/cars-av-by_card_url.csv"
 LOG_FILENAME_AV_BY = f"./logs/AV_BY/{start_time_str}/cars-av-by_log.txt"
 
 def get_info_from_next_data(text):
@@ -192,8 +192,8 @@ def make_folder(start_folder, subfolders_chain):
     return folder
 
 def main():
-    make_folder(f"{os.curdir}", ["scrapped_cards", "AV_BY", "JSON", start_time_str])
-    make_folder(f"{os.curdir}", ["scrapped_cards", "AV_BY", "CSV", start_time_str])
+    make_folder(f"{os.curdir}", ["scrapped_data", "AV_BY", "JSON", start_time_str])
+    make_folder(f"{os.curdir}", ["scrapped_data", "AV_BY", "CSV", start_time_str])
     make_folder(f"{os.curdir}", ["logs", "AV_BY", start_time_str])
 
     with \
@@ -248,7 +248,7 @@ def main():
                         if parsed_card == {}:
                             continue
 
-                        folder = make_folder(f"{os.curdir}", ["scrapped_cards", "AV_BY", "JSON", f"{start_time_str}", f"{year}", f"price_{price_usd}-{price_usd+9999}"])
+                        folder = make_folder(f"{os.curdir}", ["scrapped_data", "AV_BY", "JSON", f"{start_time_str}", f"{year}", f"price_{price_usd}-{price_usd+9999}"])
                         with open(f"{folder}/{url_updated}.json","w", encoding="utf-8") as f:
                             f.write(str(parsed_card).replace("\\xa0", " ").replace("\\u2009", " "))
 
