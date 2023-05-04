@@ -9,10 +9,11 @@ DEBUG_MODE = True        # instead of a hardcoded value, in future it'll become 
 DEBUG_TOKENIZED_ATTRS = True
 ARCHIVE_SOURCE_FILES = True
 
-spark = SparkSession.builder.master("local[*]").appName('car ads batch ETL (source to DL)') \
-    .config('spark.driver.extraJavaOptions', '-Duser.timezone=GMT') \
-    .config('spark.executor.extraJavaOptions', '-Duser.timezone=GMT') \
-    .config('spark.sql.session.timeZone', 'UTC') \
+spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
+    .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
+    .config("spark.executor.extraJavaOptions", "-Duser.timezone=GMT") \
+    .config("spark.sql.session.timeZone", "UTC") \
+    .config("spark.sql.legacy.timeParserPolicy", "LEGACY") \
     .config("spark.ui.port", "4041") \
     .config("spark.sql.parser.escapedStringLiterals", True) \
     .config("spark.sql.files.openCostInBytes", "50000") \
@@ -96,6 +97,7 @@ def tokenize_data(df):
                price_primary,
                to_number(price_primary, '$999,999') as price_usd,
                price_history,
+               case when trim(price_history) <> '' then split(trim(price_history), ' [|] ') end as price_history_split,
                location,
                labels,
                case 
@@ -255,7 +257,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         {
             "ETL_desc": "debug info - card (tokenized)",
             "format": "console",
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history_split;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
@@ -326,6 +328,24 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_gallery"},
             "mode": "overwrite",
             "process": True
+        },
+        {
+            "ETL_desc": "debug info - card_price_history",
+            "format": dest_format,
+            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$999,999') as price;scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/card_price_history"},
+            "mode": "overwrite",
+            "process": True
+        },
+        {
+            "ETL_desc": "card_price_history",
+            "format": "console",
+            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$999,999') as price;scrap_date;source_id;dl_loaded_date",
+            "partitionBy": "",
+            "options": {"header": True, "truncate": False},
+            "mode": "overwrite",
+            "process": True
         }
     ]
 
@@ -392,7 +412,7 @@ def main():
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # load tokenized & cleaned data
     save_data(cleaned_df,
-              etl_desc="card;debug info - card (tokenized);card (tokenized);debug info - card_options;card_options;debug info - card_info;card_info;debug info - card_gallery;card_gallery",
+              etl_desc="debug info - card (tokenized);card (tokenized);debug info - card_options;card_options;debug info - card_info;card_info;debug info - card_gallery;card_gallery;debug info - card_price_history;card_price_history",
               additional="archive_source_files",
               dest_format="csv")
 
