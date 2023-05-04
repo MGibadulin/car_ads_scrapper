@@ -266,7 +266,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         {
             "ETL_desc": "card (tokenized)",
             "format": dest_format,
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
             "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_tokenized"},
