@@ -23,7 +23,7 @@ headers.update({
 
 DEFAULT_HEADER = headers #{'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 SITE_URL = "https://www.cars.com"
-LOG_FILENAME_CARS_COM = f"./logs/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
+# LOG_FILENAME_CARS_COM = f"./logs/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
 
 
 def get_card_url_list(url, site_url=SITE_URL, headers=DEFAULT_HEADER):
@@ -61,8 +61,9 @@ def main():
     make_folder(f"{os.curdir}", ["logs", "cars_com", start_time_str])
     # make_folder(f"{os.curdir}", ["scrapped_data", "cars_com", "json", start_time_str])
 
-    with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
-        print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
+    # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
+    with con:
+        # print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
 
         cur = con.cursor()
 
@@ -78,16 +79,16 @@ def main():
                 for page_num in range(1, 500):
                     url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=20&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
-                    print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
+                    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
                     print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
 
                     card_url_list = get_card_url_list(url)
                     if card_url_list == []:
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
+                        # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
                         print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found")
                         break
-                    else:
-                        print(*card_url_list, sep="\n", file=log_file)
+                    # else:
+                    #     print(*card_url_list, sep="\n", file=log_file)
 
                     sql_statements = [
                         f"""                    
@@ -98,11 +99,19 @@ def main():
                             with cte_new_urls(card_url)
                             as (
                                  values {",".join([f"row('{url.removeprefix(SITE_URL)}')" for url in card_url_list])}
+                            ),
+                            cte_url_last_status 
+                            as (
+                                 select source_id, card_url, min(ad_status) as ad_status
+                                 from car_ads_db.ads
+                                 group by source_id, card_url
                             )
-                            select '{SITE_URL}' as source_id, cte.card_url, LAST_INSERT_ID() as ad_group_id
-                            from cte_new_urls cte
-                            left join car_ads_db.ads on ads.card_url = cte.card_url
-                            where (ads.ad_status is null) or (ads.ad_status = 2);
+                            select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id
+                            from cte_new_urls cte_new
+                            left join cte_url_last_status cte_existing on 
+                                             cte_new.card_url = cte_existing.card_url and
+                                             cte_existing.source_id = '{SITE_URL}'
+                            where (cte_existing.ad_status is null) or (cte_existing.ad_status = 2);
                         """]
                     for sql in sql_statements:
                         cur.execute(sql)
@@ -111,7 +120,7 @@ def main():
                     if len(card_url_list) < 20:
                         break
 
-        print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
+        # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
         print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}")
 
         cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
