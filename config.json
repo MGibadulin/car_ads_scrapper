@@ -1,0 +1,9 @@
+{
+  "audit_db": {
+      "host": "127.0.0.1",
+      "user": "timoti",
+      "password": "enter1",
+      "database": "car_ads_db",
+      "autocommit": 1    
+  }
+}

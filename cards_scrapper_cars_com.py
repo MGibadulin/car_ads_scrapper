@@ -1,30 +1,30 @@
+import pymysql
+
 from bs4 import BeautifulSoup
 import requests
-import csv
 import time
 import json
 import os
 
 
 start_time = time.time()
-start_time_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime(start_time))
+start_time_str = time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime(start_time))
 
 headers = requests.utils.default_headers()
 headers.update({
-    'Accept-Encoding': 'gzip, deflate, sdch',
-    'Accept-Language': 'en-US,en;q=0.8',
-    'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Cache-Control': 'max-age=0',
-    'Connection': 'keep-alive'
+    "Accept-Encoding": "gzip, deflate, sdch",
+    "Accept-Language": "en-US,en;q=0.8",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent": "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Cache-Control": "max-age=0",
+    "Connection": "keep-alive"
 })
 
 DEFAULT_HEADER = headers #{'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-SITE_URL = "https://www.cars.com"
-
-LOG_FILENAME_CARS_COM = f"./logs/CARS_COM/{start_time_str}/CARS_COM_log.txt"
+# SITE_URL = "https://www.cars.com"
+# LOG_FILENAME_CARS_COM = f"./logs/cars_com/{start_time_str}/cards_scrapper_cars_com_log.txt"
 
 
 def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
@@ -190,22 +190,6 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
 
     return card_dict
 
-def get_card_url_list(url, site_url=SITE_URL, headers=DEFAULT_HEADER):
-    url_list = []
-
-    page = requests.get(url, headers=headers)
-    if page.status_code == 200:
-        soup = BeautifulSoup(page.text, "html.parser")
-
-        listing_items = soup.find_all("div", class_="vehicle-card")
-        try:
-            for item in listing_items:
-                item_href = item.find("a", class_="image-gallery-link")["href"]
-                url_list.append(site_url + item_href)
-        except:
-            pass
-
-    return url_list
 
 def make_folder(start_folder, subfolders_chain):
     folder = start_folder
@@ -217,65 +201,105 @@ def make_folder(start_folder, subfolders_chain):
     return folder
 
 def main():
-    make_folder(f"{os.curdir}", ["scrapped_data", "CARS_COM", "JSON", start_time_str])
-    make_folder(f"{os.curdir}", ["scrapped_data", "CARS_COM", "CSV", start_time_str])
-    make_folder(f"{os.curdir}", ["logs", "CARS_COM", start_time_str])
+    with open("config.json") as config_file:
+        configs = json.load(config_file)
 
-    with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file:
-        print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
+    con = pymysql.connect(**configs["audit_db"])
 
-        url_num = 0
-        curr_year = int(time.strftime("%Y", time.gmtime()))
+    # make_folder(f"{os.curdir}", ["logs", "cars_com", start_time_str])
+    make_folder(f"{os.curdir}", ["scrapped_data", "cars_com", "json", start_time_str])
 
-        for year in range(curr_year, 1900, -1):
-            for price_usd in range(0, 500001, 10000):
-                for page_num in range(1, 500):
-                    url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=20&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
-                    print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
-                    print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
+    # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
+    with con:
+        # print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
 
-                    card_url_list = get_card_url_list(url)
-                    if card_url_list == []:
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found")
-                        break
-                    else:
-                        print(*card_url_list, sep="\n", file=log_file)
+        cur = con.cursor()
 
-                    for url in card_url_list:
-                        url_num += 1
+        cur.execute("insert into process_log(process_desc) values('cards_finder_cars_com.py');")
+        cur.execute("select LAST_INSERT_ID() as process_log_id;")
+        process_log_id = cur.fetchone()[0]
 
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, card: {url_num}, year: {year}: {url}", file=log_file)
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, card: {url_num}, year: {year}: {url}")
+        num = 0
+        while True:
+            # get new potion of not yet scrapped urls having the same ad_group_id
+            cur.execute("select floor(rand() * (select max(ad_group_id) from ad_groups));")
+            random_ad_group_id = cur.fetchone()[0]
 
-                        url_parts = url.split("?")
-                        url_updated = url_parts[0].replace("/", "-").replace(".", "-").replace(":", "-")
+            cur.execute(
+                    f"""
+                        with cte_random_group
+                        as
+                        (
+                            select ad_group_id as ad_group_id
+                            from car_ads_db.ads
+                            where ad_status = 0 and
+                                  ad_group_id >= {random_ad_group_id}
+                            limit 1
+                        )
+                        select a.ads_id, concat(a.source_id, a.card_url) as url, g.group_url 
+                        from car_ads_db.ads a
+                        join car_ads_db.ad_groups g on a.ad_group_id = g.ad_group_id
+                        join cte_random_group rg on g.ad_group_id = rg.ad_group_id    
+                        where a.ad_status = 0                    
+                    """
+                )
+            if cur.rowcount == 0:
+                break
 
-                        parsed_card = {}
-                        # try:
-                        if len(url_parts) == 1:
-                            parsed_card = get_parsed_card(url)
-                        # except:
-                        #     parsed_card = {}
+            records_fetched = cur.fetchall()
 
-                        if parsed_card == {}:
-                            continue
+            for ads_id, url, group_url in records_fetched:
+                num += 1
 
-                        card_id = parsed_card["card_id"]
+                for arg in group_url.split("?")[1].split("&"):
+                    arg_name, arg_value = arg.split("=")
+                    if arg_name in {"year", "year_min"}:
+                        year = arg_value
+                    if arg_name == "list_price_min":
+                        price_usd = int(arg_value)
 
-                        folder = make_folder(f"{os.curdir}",
-                                             ["scrapped_data", "CARS_COM", "JSON",
-                                              f"{start_time_str}",
-                                              f"{year}",
-                                              f"price_{price_usd}-{price_usd + 9999}"])
-                        with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
-                            f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
+                url_parts = url.split("?")
+                url_updated = url_parts[0].replace("/", "-").replace(".", "-").replace(":", "-")
 
-                    if len(card_url_list) < 20:
-                        break
+                parsed_card = {}
+                ad_status = 1
+                try:
+                    if len(url_parts) == 1:
+                        parsed_card = get_parsed_card(url)
+                except:
+                    # error when parsing the card (url)
+                    ad_status = -1
 
-        print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
+                if parsed_card != {}:
+                    # successfully parsed the card (url)
+                    ad_status = 2
+
+                    card_id = parsed_card["card_id"]
+
+                    folder = make_folder(f"{os.curdir}",
+                                         ["scrapped_data", "cars_com", "json",
+                                          f"{start_time_str}",
+                                          f"{year}",
+                                          f"price_{price_usd}-{price_usd + 9999}"])
+                    with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
+                        f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
+
+                cur.execute(
+                    f"""
+                        update car_ads_db.ads
+                           set ad_status = {ad_status},
+                               change_status_date = current_timestamp
+                        where ads_id = {ads_id}
+                    """
+                )
+
+                # print(f"{ad_status}, {time.strftime('%X', time.gmtime(time.time() - start_time))}, {ad_status}, num: {num}, ads_id: {ads_id}, year: {year}: {url}", file=log_file)
+                print(f"{time.strftime('%X', time.gmtime(time.time() - start_time))}, {ad_status}, num: {num}, ads_id: {ads_id}, year: {year}: {url}")
+
+        cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
+
+        # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
 
 
 if __name__ == "__main__":
