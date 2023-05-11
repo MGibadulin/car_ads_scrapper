@@ -245,7 +245,15 @@ def main():
                     """
                 )
             if cur.rowcount == 0:
-                break
+                # check if there is still what to do
+                cur.execute("select 1 from car_ads_db.ads where ad_status = 0 limit 1;")
+
+                if cur.rowcount == 0:
+                    # job is done
+                    break
+                else:
+                    # there is still what to do, let's choose another random_ad_group_id
+                    continue
 
             records_fetched = cur.fetchall()
 
