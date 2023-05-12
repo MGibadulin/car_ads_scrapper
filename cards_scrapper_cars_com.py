@@ -216,7 +216,7 @@ def main():
 
         cur = con.cursor()
 
-        cur.execute("insert into process_log(process_desc) values('cards_finder_cars_com.py');")
+        cur.execute("insert into process_log(process_desc) values('cards_scrapper_cars_com.py');")
         cur.execute("select LAST_INSERT_ID() as process_log_id;")
         process_log_id = cur.fetchone()[0]
 
@@ -241,7 +241,7 @@ def main():
                         from car_ads_db.ads a
                         join car_ads_db.ad_groups g on a.ad_group_id = g.ad_group_id
                         join cte_random_group rg on g.ad_group_id = rg.ad_group_id    
-                        where a.ad_status = 0                    
+                        where a.ad_status = 0;                    
                     """
                 )
             if cur.rowcount == 0:
@@ -297,6 +297,7 @@ def main():
                     f"""
                         update car_ads_db.ads
                            set ad_status = {ad_status},
+                               change_status_process_log_id = {process_log_id},
                                change_status_date = current_timestamp
                         where ads_id = {ads_id}
                     """

@@ -95,7 +95,7 @@ def main():
                             insert into ad_groups(group_url, process_log_id) values('{url}', {process_log_id});
                         """,
                         f"""
-                            insert into car_ads_db.ads(source_id, card_url, ad_group_id) 
+                            insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
                             with cte_new_urls(card_url)
                             as (
                                  values {",".join([f"row('{url.removeprefix(SITE_URL)}')" for url in card_url_list])}
@@ -106,7 +106,7 @@ def main():
                                  from car_ads_db.ads
                                  group by source_id, card_url
                             )
-                            select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id
+                            select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
                             from cte_new_urls cte_new
                             left join cte_url_last_status cte_existing on 
                                              cte_new.card_url = cte_existing.card_url and
@@ -115,7 +115,6 @@ def main():
                         """]
                     for sql in sql_statements:
                         cur.execute(sql)
-                    con.commit()
 
                     if len(card_url_list) < 20:
                         break
@@ -124,7 +123,6 @@ def main():
         print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}")
 
         cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
-        con.commit()
 
 
 if __name__ == "__main__":
