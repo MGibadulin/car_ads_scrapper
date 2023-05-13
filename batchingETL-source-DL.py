@@ -17,8 +17,9 @@ spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (sour
     .config("spark.ui.port", "4041") \
     .config("spark.sql.parser.escapedStringLiterals", True) \
     .config("spark.sql.files.openCostInBytes", "50000") \
-    .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 100) \
-    .config("spark.executor.memory", "700m") \
+    .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
+    .config("spark.executor.memory", "3g") \
+    .config("spark.driver.memory", "3g") \
     .getOrCreate()
 # about partitioning in Spark: https://medium.com/swlh/building-partitions-for-processing-data-files-in-apache-spark-2ca40209c9b7
 
@@ -54,7 +55,7 @@ def create_input_df():
         .add("description", StringType(), False) \
         .add("scrap_date", TimestampType(), False)
 
-    # print(os.getcwd() + "/scrapped_data/CARS_COM/JSON/*/*/*/")
+    # print(os.getcwd() + "/scrapped_data/cars_com/json/*/*/*/")
     # read source files - go through all the existing files
     source_df = spark \
         .read \
@@ -62,7 +63,7 @@ def create_input_df():
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", "scrapped_data/CARS_COM/JSON/*/*/*/") \
+        .option("path", "scrapped_data/cars_com/json/*/*/*/") \
         .load() \
         .withColumn("input_file_name", input_file_name()) \
         .withColumn("source_id", lit("cars.com scrapper")) \
@@ -88,14 +89,18 @@ def tokenize_data(df):
                   cast((cast(regexp_replace(price_primary, '[$,]', '') as int) div 10000)*10000 as string),
                   '-',
                   cast((cast(regexp_replace(price_primary, '[$,]', '') as int) div 10000)*10000 + 9999 as string)
-               ) as price,*/
-               concat(
-                  cast((to_number(price_primary, '$999,999') div 10000)*10000 as string),
-                  '-',
-                  cast((to_number(price_primary, '$999,999') div 10000)*10000 + 9999 as string)
-               ) as price_range,
+               ) as price_range,*/
+               case 
+                    when try_to_number(price_primary, '$9,999,999,999') is not null
+                    then concat(
+                            cast((try_to_number(price_primary, '$9,999,999,999') div 10000)*10000 as string),
+                            '-',
+                            cast((try_to_number(price_primary, '$9,999,999,999') div 10000)*10000 + 9999 as string)
+                        ) 
+                    else 'Unknown'
+               end as price_range,
                price_primary,
-               to_number(price_primary, '$999,999') as price_usd,
+               try_to_number(price_primary, '$9,999,999,999') as price_usd,
                price_history,
                case when trim(price_history) <> '' then split(trim(price_history), ' [|] ') end as price_history_split,
                location,
@@ -123,8 +128,10 @@ def tokenize_data(df):
                    when instr(split(description, ', ')[1], 'CVT') <> 0 then 'CVT'
                    when instr(split(description, ', ')[1], 'DCT') <> 0 then 'DCT'
                    when instr(split(description, ', ')[1], 'DSG') <> 0 then 'DSG'
-                   when instr(split(description, ', ')[1], 'Manual') <> 0 then 'Manual'
-                   when instr(split(description, ', ')[1], 'Automatic') <> 0 then 'Automatic'
+                   when instr(split(description, ', ')[1], 'Manual') <> 0 or 
+                        instr(split(description, ', ')[1], 'M/T') <> 0 then 'Manual'
+                   when instr(split(description, ', ')[1], 'Automatic') <> 0 or
+                        instr(split(description, ', ')[1], 'A/T') <> 0 then 'Automatic'
                    else ''
                end as transmission_type,
                split(description, ', ')[2] as engine, 
@@ -164,7 +171,8 @@ def clean_data(df, additional=None):
         trim(transmission) in ('', '–') or
         trim(engine) in ('', '–') or
         trim(drive) in ('', '–') or
-        milage in ('', '–')          
+        milage in ('', '–') or
+        price_usd is null      
     """)
 
     if "archive_baddata_source_files" in additional_actions:
@@ -178,7 +186,8 @@ def clean_data(df, additional=None):
             trim(transmission) not in ('', '–') and
             trim(engine) not in ('', '–') and
             trim(drive) not in ('', '–') and
-            milage not in ('', '–')          
+            milage not in ('', '–') and
+            price_usd is not null   
         """)
 
 
@@ -221,7 +230,7 @@ def process_source_files(df, dest_folder, mode="archive_source_files"):
 
 
 def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
-    # df = df.coalesce(8)
+    df = df.coalesce(1)
     # df.persist()
 
     ETL_configs = [
@@ -240,24 +249,14 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;options;gallery;url;scrap_date;source_id;dl_loaded_date;input_file_name",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card"},
-            "mode": "overwrite",
-            "process": True
-        },
-        {
-            "ETL_desc": "card",
-            "format": dest_format,
-            "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;scrap_date;source_id;dl_loaded_date",
-            # "partitionBy": "year;price_range",
-            "partitionBy": "",
-            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card"},
+            "options": {"header": True, "path": f"batch_data/cars_com/{dest_format}/car_card_direct"},
             "mode": "overwrite",
             "process": True
         },
         {
             "ETL_desc": "debug info - card (tokenized)",
             "format": "console",
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;price_history_split;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "attr_list": "card_id;vehicle;year;price_range;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
@@ -266,10 +265,10 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         {
             "ETL_desc": "card (tokenized)",
             "format": dest_format,
-            "attr_list": "card_id;vehicle;year;price_range;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "attr_list": "card_id;vehicle;year;price_history;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_tokenized"},
+            "options": {"header": True, "path": f"batch_data/cars_com/{dest_format}/car_card_tokenized"},
             "mode": "overwrite",
             "process": True
         },
@@ -289,7 +288,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "attr_list": "card_id;explode(options) as option_group;scrap_date;source_id;dl_loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "category",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False, "path": f"batch_data/CARS_COM/{dest_format}/car_card_options"},
+            "options": {"header": True, "truncate": False, "path": f"batch_data/cars_com/{dest_format}/car_card_options"},
             "mode": "overwrite",
             "process": True
         },
@@ -307,7 +306,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "format": dest_format,
             "attr_list": "card_id;url;source_file_name;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False, "path": f"batch_data/CARS_COM/{dest_format}/car_card_info"},
+            "options": {"header": True, "truncate": False, "path": f"batch_data/cars_com/{dest_format}/car_card_info"},
             "mode": "overwrite",
             "process": True
         },
@@ -325,29 +324,31 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "format": dest_format,
             "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/car_card_gallery"},
+            "options": {"header": True, "path": f"batch_data/cars_com/{dest_format}/car_card_gallery"},
             "mode": "overwrite",
             "process": True
         },
         {
             "ETL_desc": "debug info - card_price_history",
-            "format": dest_format,
-            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$999,999') as price;scrap_date;source_id;dl_loaded_date",
+            "format": "console",
+            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$9,999,999,999') as price;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": f"batch_data/CARS_COM/{dest_format}/card_price_history"},
+            "options": {"header": True, "truncate": False},
             "mode": "overwrite",
             "process": True
         },
         {
             "ETL_desc": "card_price_history",
-            "format": "console",
-            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$999,999') as price;scrap_date;source_id;dl_loaded_date",
+            "format": dest_format,
+            "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$9,999,999,999') as price;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False},
+            "options": {"header": True, "path": f"batch_data/cars_com/{dest_format}/card_price_history"},
             "mode": "overwrite",
             "process": True
         }
     ]
+
+    additional_actions = additional.split("|")
 
     for etl_config in ETL_configs:
         if not etl_config["process"] or (etl_desc not in [None, "", '*'] and etl_config["ETL_desc"] not in etl_desc.split(";")):
@@ -356,6 +357,9 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         stage = df
         for attrs_to_select in etl_config["attr_list"].split("|"):
             stage = stage.selectExpr(attrs_to_select.split(";"))
+
+        if "debug info" in additional_actions:
+            stage.show(truncate=False)
 
         stage = stage.write \
             .format(etl_config["format"]) \
@@ -370,8 +374,6 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
 
         stage.save()
 
-    additional_actions = additional.split("|")
-
     if "archive_source_files" in additional_actions:
         process_source_files(df, dest_folder="archived_data", mode="archive_source_files")
     if "delete_source_files" in additional_actions:
@@ -383,7 +385,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             .format(dest_format) \
             .option("encoding", "UTF-8") \
             .option("multiLine", True) \
-            .option("path", f"batch_data/CARS_COM/{dest_format}/car_card") \
+            .option("path", f"batch_data/cars_com/{dest_format}/car_card") \
             .load()
 
     # df.unpersist()
@@ -400,21 +402,26 @@ def main():
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # load data without any processing but with new audit attributes added
     source_df = save_data(source_df,
-                          etl_desc="debug info - card (direct);card (direct)",
+                          etl_desc="card (direct)",
                           additional="reopen_df",
                           dest_format="parquet")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # transform data
     tokenized_df = tokenize_data(source_df)
-    cleaned_df = clean_data(tokenized_df, additional="archive_baddata_source_files")
+    # cleaned_df = clean_data(tokenized_df, additional="archive_baddata_source_files")
+    cleaned_df = clean_data(tokenized_df, additional="")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # load tokenized & cleaned data
+    # save_data(cleaned_df,
+    #           etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
+    #           additional="archive_source_files",
+    #           dest_format="csv")
     save_data(cleaned_df,
-              etl_desc="debug info - card (tokenized);card (tokenized);debug info - card_options;card_options;debug info - card_info;card_info;debug info - card_gallery;card_gallery;debug info - card_price_history;card_price_history",
-              additional="archive_source_files",
-              dest_format="csv")
+              etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
+              additional="debug info",
+              dest_format="parquet")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
 

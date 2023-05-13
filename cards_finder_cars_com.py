@@ -76,8 +76,8 @@ def main():
 
         for year in range(curr_year, 1900, -1):
             for price_usd in range(0, 500001, 10000):
-                for page_num in range(1, 500):
-                    url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=20&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
+                for page_num in range(1, 100):
+                    url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=100&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
                     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
                     print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
@@ -116,7 +116,7 @@ def main():
                     for sql in sql_statements:
                         cur.execute(sql)
 
-                    if len(card_url_list) < 20:
+                    if len(card_url_list) < 100:
                         break
 
         # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
