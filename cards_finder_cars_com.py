@@ -98,7 +98,7 @@ def main():
                             insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
                             with cte_new_urls(card_url)
                             as (
-                                 values {",".join([f"row('{url.removeprefix(SITE_URL)}')" for url in card_url_list])}
+                                 values {",".join([f"row('{url[len(SITE_URL):]}')" for url in card_url_list])}
                             ),
                             cte_url_last_status 
                             as (

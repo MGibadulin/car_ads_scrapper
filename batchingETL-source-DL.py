@@ -367,9 +367,10 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
                 .option("credentialsFile", "bigquery-credentials.json") \
                 .option('parentProject', GCP_PROJECT_ID) \
                 .option("table", f"{GCP_PROJECT_ID}.{GCP_DATASET_NAME}.{GCP_TABLE_NAME}") \
-                .option("temporaryGcsBucket", GCP_TEMPORARY_BUCKET_NAME) \
+                .option("writeMethod", "direct") \
                 .mode("overwrite") \
                 .save()
+                # .option("temporaryGcsBucket", GCP_TEMPORARY_BUCKET_NAME)
         else:
             stage = df
             for attrs_to_select in etl_config["attr_list"].split("|"):
@@ -422,7 +423,7 @@ def main():
     source_df = save_data(source_df,
                           etl_desc="card (direct)",
                           additional="reopen_df",
-                          dest_format="parquet")
+                          dest_format="bigquery")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # transform data

@@ -10,9 +10,9 @@ create table if not exists ads
     card_url                     varchar(255) not null,
     ad_group_id                  int not null,
     insert_process_log_id        int,
-    insert_date                  datetime not null default(current_timestamp),
+    insert_date                  datetime not null default current_timestamp,
     change_status_process_log_id int,
-    ad_status                    tinyint not null default(0),
+    ad_status                    tinyint not null default 0,
     change_status_date           datetime
 );
 
@@ -24,7 +24,7 @@ create table if not exists ad_groups
     
     group_url           varchar(255) not null,
     process_log_id      int not null,
-    insert_date         datetime not null default(current_timestamp)    
+    insert_date         datetime not null default current_timestamp
 );
 
 create table process_log
@@ -32,6 +32,6 @@ create table process_log
     process_log_id      int not null primary key auto_increment,
     
     process_desc        varchar(255) not null,
-    start_date          datetime not null default(current_timestamp),
+    start_date          datetime not null default current_timestamp,
     end_date            datetime
-)
+);
