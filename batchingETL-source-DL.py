@@ -1,6 +1,5 @@
 import os
 import time
-import base64
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType, StringType, TimestampType, StructType
@@ -10,17 +9,12 @@ DEBUG_MODE = True        # instead of a hardcoded value, in future it'll become 
 DEBUG_TOKENIZED_ATTRS = True
 ARCHIVE_SOURCE_FILES = True
 
-GCP_PROJECT_ID = "paid-project-346208"
-GCP_DATASET_NAME = "car_ads_ds_landing"
-GCP_TABLE_NAME = "cars_com_card_direct"
-GCP_TEMPORARY_BUCKET_NAME = "temporary_spark_bucket"
-
 spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
     .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
     .config("spark.executor.extraJavaOptions", "-Duser.timezone=GMT") \
     .config("spark.sql.session.timeZone", "UTC") \
     .config("spark.sql.legacy.timeParserPolicy", "LEGACY") \
-    .config("spark.ui.port", "4041") \
+    .config("spark.ui.enabled", False) \
     .config("spark.sql.parser.escapedStringLiterals", True) \
     .config("spark.sql.files.openCostInBytes", "50000") \
     .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
@@ -28,6 +22,7 @@ spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (sour
     .config("spark.driver.memory", "3g") \
     .getOrCreate()
 
+    # .config("spark.ui.port", "4041") \
     # .config("spark.jars.packages", "com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.18.0") \
     # about partitioning in Spark: https://medium.com/swlh/building-partitions-for-processing-data-files-in-apache-spark-2ca40209c9b7
 
@@ -273,7 +268,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         {
             "ETL_desc": "card (tokenized)",
             "format": dest_format,
-            "attr_list": "card_id;vehicle;year;price_history;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
+            "attr_list": "card_id;vehicle;year;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
             "options": {"header": True, "path": f"batch_data/cars_com/{dest_format}/car_card_tokenized"},
@@ -362,35 +357,25 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
         if not etl_config["process"] or (etl_desc not in [None, "", '*'] and etl_config["ETL_desc"] not in etl_desc.split(";")):
             continue
 
-        if etl_config["ETL_desc"] == "card (direct)" and dest_format == "bigquery":
-            df.write.format("bigquery") \
-                .option("credentialsFile", "bigquery-credentials.json") \
-                .option('parentProject', GCP_PROJECT_ID) \
-                .option("table", f"{GCP_PROJECT_ID}.{GCP_DATASET_NAME}.{GCP_TABLE_NAME}") \
-                .option("writeMethod", "direct") \
-                .mode("overwrite") \
-                .save()
-                # .option("temporaryGcsBucket", GCP_TEMPORARY_BUCKET_NAME)
-        else:
-            stage = df
-            for attrs_to_select in etl_config["attr_list"].split("|"):
-                stage = stage.selectExpr(attrs_to_select.split(";"))
+        stage = df
+        for attrs_to_select in etl_config["attr_list"].split("|"):
+            stage = stage.selectExpr(attrs_to_select.split(";"))
 
-            if "debug info" in additional_actions:
-                stage.show(truncate=False)
+        if "debug info" in additional_actions:
+            stage.show(truncate=False)
 
-            stage = stage.write \
-                .format(etl_config["format"]) \
-                .options(**etl_config["options"]) \
-                .mode(etl_config["mode"])
+        stage = stage.write \
+            .format(etl_config["format"]) \
+            .options(**etl_config["options"]) \
+            .mode(etl_config["mode"])
 
-            if etl_config["partitionBy"] != "":
-                stage = stage.partitionBy(etl_config["partitionBy"].split(";"))
+        if etl_config["partitionBy"] != "":
+            stage = stage.partitionBy(etl_config["partitionBy"].split(";"))
 
-            if etl_config["format"] == "console":
-                print(f"{etl_config['ETL_desc']}:")
+        if etl_config["format"] == "console":
+            print(f"{etl_config['ETL_desc']}:")
 
-            stage.save()
+        stage.save()
 
 
     if "archive_source_files" in additional_actions:
@@ -423,24 +408,24 @@ def main():
     source_df = save_data(source_df,
                           etl_desc="card (direct)",
                           additional="reopen_df",
-                          dest_format="bigquery")
+                          dest_format="parquet")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
     # transform data
-    # tokenized_df = tokenize_data(source_df)
-    # # cleaned_df = clean_data(tokenized_df, additional="archive_baddata_source_files")
-    # cleaned_df = clean_data(tokenized_df, additional="")
-    #
-    # # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
-    # # load tokenized & cleaned data
-    # # save_data(cleaned_df,
-    # #           etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
-    # #           additional="archive_source_files",
-    # #           dest_format="csv")
+    tokenized_df = tokenize_data(source_df)
+    # cleaned_df = clean_data(tokenized_df, additional="archive_baddata_source_files")
+    cleaned_df = clean_data(tokenized_df, additional="")
+
+    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
+    # load tokenized & cleaned data
     # save_data(cleaned_df,
     #           etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
-    #           additional="debug info",
-    #           dest_format="parquet")
+    #           additional="archive_source_files",
+    #           dest_format="csv")
+    save_data(cleaned_df,
+              etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
+              additional="debug info",
+              dest_format="parquet")
 
     # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}")
 
