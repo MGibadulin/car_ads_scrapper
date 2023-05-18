@@ -2,14 +2,15 @@
 # sudo google_metadata_script_runner startup
 
 # sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
-sudo mkdir -p /mnt/disk-for-data/car_ads_scrapper
-sudo mkdir -p /mnt/disk-for-data/mysql
+sudo mkdir -p /mnt/disk-for-data
 
 echo UUID=`sudo blkid -s UUID -o value /dev/sdb` /mnt/disk-for-data/ ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab
 
 sudo mount -o discard,defaults /dev/sdb /mnt/disk-for-data
 sudo chmod a+w /mnt/disk-for-data/
 
+sudo mkdir -p /mnt/disk-for-data/mysql
+sudo mkdir -p /mnt/disk-for-data/car_ads_scrapper
 
 sudo apt update	
 

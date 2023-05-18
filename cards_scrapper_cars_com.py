@@ -204,10 +204,10 @@ def main():
 
     con = pymysql.connect(**configs["audit_db"])
 
-    # make_folder(configs["folders"]["logs"], ["cars_com", start_time_str])
-    make_folder(configs["folders"]["scrapped_data"], ["cars_com", "json", start_time_str])
+    # make_folder(configs["folders"]["base_folder"], [configs["folders"]["logs"], "cars_com", start_time_str])
+    make_folder(configs["folders"]["base_folder"], [configs["folders"]["scrapped_data"], "cars_com", "json", start_time_str])
 
-    # LOG_FILENAME_CARS_COM = f"{configs['folders']['logs']}/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
+    # LOG_FILENAME_CARS_COM = f"{configs['folders']['base_folder']}/{configs['folders']['logs']}/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
 
     # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
     with con:
@@ -284,11 +284,14 @@ def main():
 
                     card_id = parsed_card["card_id"]
 
-                    folder = make_folder(configs["folders"]["scrapped_data"],
-                                         ["cars_com", "json",
-                                          f"{start_time_str}",
-                                          f"{year}",
-                                          f"price_{price_usd}-{price_usd + 9999}"])
+                    folder = make_folder(configs["folders"]["base_folder"],
+                                         [
+                                             configs["folders"]["scrapped_data"],
+                                             "cars_com", "json",
+                                             f"{start_time_str}",
+                                             f"{year}",
+                                             f"price_{price_usd}-{price_usd + 9999}"
+                                         ])
                     with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
                         f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
 

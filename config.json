@@ -8,11 +8,13 @@
   },
 
   "folders": {
-    "archived_data": "/mnt/disk-for-data/car_scrapper/archived_data",
-    "bad_data": "/mnt/disk-for-data/car_scrapper/bad_data",
-    "batch_data": "/mnt/disk-for-data/car_scrapper/batch_data",
-    "logs": "/mnt/disk-for-data/car_scrapper/logs",
-    "scrapped_data": "/mnt/disk-for-data/car_scrapper/scrapped_data",
+    "base_folder": "/mnt/disk-for-data/car_scrapper",
+
+    "archived_data": "archived_data",
+    "bad_data": "bad_data",
+    "batch_data": "batch_data",
+    "logs": "logs",
+    "scrapped_data": "scrapped_data",
 
     "program": "/soft/car_ads_scrapper"
   }
