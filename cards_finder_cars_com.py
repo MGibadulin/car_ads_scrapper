@@ -23,7 +23,6 @@ headers.update({
 
 DEFAULT_HEADER = headers #{'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 SITE_URL = "https://www.cars.com"
-# LOG_FILENAME_CARS_COM = f"./logs/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
 
 
 def get_card_url_list(url, site_url=SITE_URL, headers=DEFAULT_HEADER):
@@ -58,8 +57,10 @@ def main():
 
     con = pymysql.connect(**configs["audit_db"])
 
-    make_folder(f"{os.curdir}", ["logs", "cars_com", start_time_str])
-    # make_folder(f"{os.curdir}", ["scrapped_data", "cars_com", "json", start_time_str])
+    # make_folder(configs["folders"]["logs"], ["cars_com", start_time_str])
+    # make_folder(configs["folders"]["scrapped_data"], ["cars_com", "json", start_time_str])
+
+    # LOG_FILENAME_CARS_COM = f"{configs['folders']['logs']}/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
 
     # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
     with con:
