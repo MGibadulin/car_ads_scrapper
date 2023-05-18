@@ -8,7 +8,7 @@
   },
 
   "folders": {
-    "base_folder": "/mnt/disk-for-data/car_scrapper",
+    "base_folder": "/mnt/disk-for-data/car_ads_scrapper",
 
     "archived_data": "archived_data",
     "bad_data": "bad_data",
@@ -19,3 +19,4 @@
     "program": "/soft/car_ads_scrapper"
   }
 }
+
