@@ -104,11 +104,11 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (2GB)"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (1GB)"
     echo
     sudo mkdir -v /var/cache/swap
     cd /var/cache/swap
-    sudo dd if=/dev/zero of=swapfile bs=1K count=2M
+    sudo dd if=/dev/zero of=swapfile bs=1K count=1M
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Enabling swapping"
