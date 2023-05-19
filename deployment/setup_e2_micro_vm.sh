@@ -6,7 +6,7 @@
 
 if [ ! -d /mnt/disk-for-data ]; then
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Mounting external data disk"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Mounting external data disk"
     echo
     sudo mkdir -p /mnt/disk-for-data
     echo UUID=`sudo blkid -s UUID -o value /dev/sdb` /mnt/disk-for-data/ ext4 discard,defaults,nofail 0 2 | sudo tee -a /etc/fstab
@@ -16,7 +16,7 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Creating data folders"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating data folders"
     echo
     sudo mkdir -p /mnt/disk-for-data/mysql
     sudo mkdir -p /mnt/disk-for-data/car_ads_scrapper
@@ -24,7 +24,7 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Installing docker subsystem"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing docker subsystem"
     echo
     sudo apt update
     sudo apt install --yes docker.io
@@ -32,21 +32,21 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Pulling mysql-server:8.0 docker image"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Pulling mysql-server:8.0 docker image"
     echo
     sudo docker image pull mysql/mysql-server:8.0
     echo 
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Staarting mysql-server:8.0 docker container"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Starting mysql-server:8.0 docker container"
     echo
     sudo docker run --name mysql --restart=always -p 3306:3306 -v /mnt/disk-for-data/mysql:/var/lib/mysql/ -d -e "MYSQL_ROOT_PASSWORD=enter1" mysql/mysql-server:8.0
     echo 
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Cloning github repository"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Cloning github repository"
     echo
     sudo mkdir /soft
     sudo git clone https://github.com/timoti1/car_ads_scrapper /soft/car_ads_scrapper
@@ -58,7 +58,7 @@ if [ ! -d /mnt/disk-for-data ]; then
     #echo "JAVA_HOME=/usr/bin/java" >> /etc/environment
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Installing python dependencies"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"
     echo
     sudo apt install --yes python3-pip
     sudo pip3 install -r /soft/car_ads_scrapper/requirements_scrapper.txt
@@ -67,77 +67,77 @@ if [ ! -d /mnt/disk-for-data ]; then
 
     # set the rdbms up
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Creating database (mysql) objects"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating database (mysql) objects"
     echo
     sudo docker exec -i mysql mysql -uroot -penter1  < /soft/car_ads_scrapper/car_ads_db/DDL/create_objects.sql
     echo 
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Creating database (mysql) users"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating database (mysql) users"
     echo
-    sudo docker exec -i mysql mysql -uroot -penter1  < /soft/car_ads_scrapper/mysql_setup_users.sql
+    sudo docker exec -i mysql mysql -uroot -penter1  < /soft/car_ads_scrapper/deployment/mysql_setup_users.sql
     echo 
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Updating database (mysqld) settings"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Updating database (mysqld) settings"
     echo
-    sudo docker exec -i mysql /bash -c "cat > /etc/my.cnf" < /soft/car_ads_scrapper/deployment/mysql.cnf
+    sudo docker exec -i mysql bash -c "cat > /etc/my.cnf" < /soft/car_ads_scrapper/deployment/mysql.cnf
     echo 
     echo
 
     # mysql --user=root --password="$(cat /root/.mysql)"
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Restaring rdbms (mysql) docker container"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Restaring rdbms (mysql) docker container"
     echo
     sudo docker restart mysql
     echo 
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Installing mysql client tool"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing mysql client tool"
     echo
     sudo apt install --yes mysql-client
     echo
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Creating a swap file (2GB)"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (2GB)"
     echo
     sudo mkdir -v /var/cache/swap
     cd /var/cache/swap
     sudo dd if=/dev/zero of=swapfile bs=1K count=2M
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Enabling swapping"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Enabling swapping"
     echo
     sudo chmod 600 swapfile
     sudo mkswap swapfile
     sudo swapon swapfile
 
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "Adding record to /etc/fstab for automounting swap file"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
     echo
     echo "/var/cache/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     echo
 else
     echo "------------------------------------------------------------"
-    echo $(date "%X UTC:   ") "The automation script had been executed previously"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "The automation script had been executed previously"
     echo 
     echo
 fi
 
 echo "------------------------------------------------------------"
-echo $(date "%X UTC:   ") "Waiting for everything to be started and mounted"
+echo $(date "+%Y-%m-%d %H:%M:%S") "Waiting for everything to be started and mounted"
 echo
 echo
 # hope 1m is enough...
 sleep 60
 
 echo "------------------------------------------------------------"
-echo $(date "%X UTC:   ") "Starting cards_finder_cars_com.py"
+echo $(date "+%Y-%m-%d %H:%M:%S") "Starting cards_finder_cars_com.py"
 echo
 cd /soft/car_ads_scrapper
 sudo nohup python3 cards_finder_cars_com.py &
