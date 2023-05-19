@@ -17,22 +17,41 @@
 
 performance_schema = off
 key_buffer_size = 16M
-tmp_table_size = 1M
-innodb_buffer_pool_size = 1M
-innodb_log_buffer_size = 1M
+tmp_table_size = 32M
+
+innodb_buffer_pool_size = 128M
+innodb_log_file_size = 256М
+innodb_log_buffer_size = 6M
+innodb_additional_mem_pool_size = 16M
+innodb_flush_method = O_DSYNC
+innodb_flush_log_at_trx_commit = 2
+innodb_thread_concurrency = 4
+innodb_file_per_table = 1
+innodb_stats_on_metadata = OFF
+
 max_connections = 25
-sort_buffer_size = 512K
-read_buffer_size = 256K
-read_rnd_buffer_size = 512K
-join_buffer_size = 128K
-thread_stack = 196K
+
+thread_stack = 1M
+thread_cache_size = 4
+
+sort_buffer_size = 16M
+read_buffer_size = 16M
+read_rnd_buffer_size = 16M
+join_buffer_size = 8M
+binlog_cache_size = 32M
+
+query_cache_limit = 1M
+query_cache_size = 0 query_cache_type = 1
+
+skip-external-locking
+skip-host-cache
+skip-name-resolve
 
 # Remove leading # to revert to previous value for default_authentication_plugin,
 # this will increase compatibility with older clients. For background, see:
 # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin
 # default-authentication-plugin=mysql_native_password
-skip-host-cache
-skip-name-resolve
+
 datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
 secure-file-priv=/var/lib/mysql-files
