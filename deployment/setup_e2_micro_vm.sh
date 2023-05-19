@@ -139,13 +139,14 @@ sleep 60
 echo "------------------------------------------------------------"
 echo $(date "+%Y-%m-%d %H:%M:%S") "Starting cards_finder_cars_com.py"
 echo
-cd /soft/car_ads_scrapper
-sudo nohup python3 cards_finder_cars_com.py &
-echo
-echo
 
-# sleep 30
+cd /soft/car_ads_scrapper
+
 # sudo nohup python3 cards_scrapper_cars_com.py &
+python3 cards_finder_cars_com.py
+
+sleep 30
+# python3 cards_scrapper_cars_com.py &
 
 
 
