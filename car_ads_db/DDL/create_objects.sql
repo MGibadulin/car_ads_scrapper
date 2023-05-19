@@ -34,4 +34,4 @@ create table if not exists process_log
     end_date            datetime
 );
 
-create index if not exists ix_ads_ad_group_id on ads(ad_group_id);
+create index ix_ads_ad_group_id on ads(ad_group_id);
