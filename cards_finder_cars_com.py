@@ -1,3 +1,5 @@
+import random
+
 import pymysql
 
 from bs4 import BeautifulSoup
@@ -75,50 +77,55 @@ def main():
         url_num = 0
         curr_year = int(time.strftime("%Y", time.gmtime()))
 
-        for year in range(curr_year, 1900, -1):
-            for price_usd in range(0, 500001, 10000):
-                for page_num in range(1, 100):
-                    url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=100&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
+        # for year in range(curr_year, 1900, -1):
+        #     for price_usd in range(0, 500001, 10000):
+        #         for page_num in range(1, 100):
+        while True:
+            year = random.randint(1900, curr_year)
+            price_usd = random.randint(0, 50)*10000
+            page_num = random.randint(1, 100)
 
-                    # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
-                    print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
+            url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=100&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
-                    card_url_list = get_card_url_list(url)
-                    if card_url_list == []:
-                        # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
-                        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found")
-                        break
-                    # else:
-                    #     print(*card_url_list, sep="\n", file=log_file)
+            # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
+            print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
 
-                    sql_statements = [
-                        f"""                    
-                            insert into ad_groups(group_url, process_log_id) values('{url}', {process_log_id});
-                        """,
-                        f"""
-                            insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
-                            with cte_new_urls(card_url)
-                            as (
-                                 values {",".join([f"row('{url[len(SITE_URL):]}')" for url in card_url_list])}
-                            ),
-                            cte_url_last_status 
-                            as (
-                                 select source_id, card_url, min(ad_status) as ad_status
-                                 from car_ads_db.ads
-                                 group by source_id, card_url
-                            )
-                            select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
-                            from cte_new_urls cte_new
-                            left join cte_url_last_status cte_existing on 
-                                             cte_new.card_url = cte_existing.card_url and
-                                             cte_existing.source_id = '{SITE_URL}'
-                            where (cte_existing.ad_status is null) or (cte_existing.ad_status = 2);
-                        """]
-                    for sql in sql_statements:
-                        cur.execute(sql)
+            card_url_list = get_card_url_list(url)
+            if card_url_list == []:
+                # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found")
+                continue
+            # else:
+            #     print(*card_url_list, sep="\n", file=log_file)
 
-                    if len(card_url_list) < 100:
-                        break
+            sql_statements = [
+                f"""                    
+                    insert into ad_groups(group_url, process_log_id) values('{url}', {process_log_id});
+                """,
+                f"""
+                    insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
+                    with cte_new_urls(card_url)
+                    as (
+                         values {",".join([f"row('{url[len(SITE_URL):]}')" for url in card_url_list])}
+                    ),
+                    cte_url_last_status 
+                    as (
+                         select source_id, card_url, min(ad_status) as ad_status
+                         from car_ads_db.ads
+                         group by source_id, card_url
+                    )
+                    select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
+                    from cte_new_urls cte_new
+                    left join cte_url_last_status cte_existing on 
+                                     cte_new.card_url = cte_existing.card_url and
+                                     cte_existing.source_id = '{SITE_URL}'
+                    where (cte_existing.ad_status is null) or (cte_existing.ad_status = 2);
+                """]
+            for sql in sql_statements:
+                cur.execute(sql)
+
+            # if len(card_url_list) < 100:
+            #     break
 
         # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
         print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}")
