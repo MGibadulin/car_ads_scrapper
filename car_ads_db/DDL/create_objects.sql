@@ -16,8 +16,6 @@ create table if not exists ads
     change_status_date           datetime
 );
 
-create index ix_ads_ad_group_id on ads(ad_group_id);
-
 create table if not exists ad_groups
 (
     ad_group_id         int not null primary key auto_increment,
@@ -27,7 +25,7 @@ create table if not exists ad_groups
     insert_date         datetime not null default current_timestamp
 );
 
-create table process_log
+create table if not exists process_log
 (
     process_log_id      int not null primary key auto_increment,
     
@@ -35,3 +33,5 @@ create table process_log
     start_date          datetime not null default current_timestamp,
     end_date            datetime
 );
+
+create index if not exists ix_ads_ad_group_id on ads(ad_group_id);
