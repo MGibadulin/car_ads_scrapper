@@ -30,8 +30,26 @@ create table if not exists process_log
     process_log_id      int not null primary key auto_increment,
     
     process_desc        varchar(255) not null,
+    `user`              varchar(255) not null,
+    host                varchar(255) not null,
     start_date          datetime not null default current_timestamp,
     end_date            datetime
 );
 
-create index ix_ads_ad_group_id on ads(ad_group_id);
+set @exist := (select count(*) from information_schema.statistics where table_name = 'ads' and index_name = 'ix_ads_ad_group_id' and table_schema = database());
+set @sqlstmt := if( @exist > 0, 'select ''INFO: Index already exists.''', 'create index ix_ads_ad_group_id on ads ( ad_group_id );');
+prepare stmt from @sqlstmt;
+execute stmt;
+
+set @exist := (select count(*) from information_schema.statistics where table_name = 'ads' and index_name = 'ix_ads_source_id_card_url_ad_status' and table_schema = database());
+set @sqlstmt := if( @exist > 0, 'select ''INFO: Index already exists.''', 'create index ix_ads_source_id_card_url_ad_status on ads(card_url, source_id, ad_status);');
+prepare stmt from @sqlstmt;
+execute stmt;
+
+set @exist := (select count(*) from information_schema.statistics where table_name = 'ads' and index_name = 'ix_ads_ad_status' and table_schema = database());
+set @sqlstmt := if( @exist > 0, 'select ''INFO: Index already exists.''', 'create index ix_ads_ad_status on ads(ad_status);');
+prepare stmt from @sqlstmt;
+execute stmt;
+
+
+
