@@ -53,6 +53,10 @@ def make_folder(start_folder, subfolders_chain):
 
     return folder
 
+
+def progress(total, left):
+    return ((total-left)/total) * 100
+
 def main():
     with open("config.json") as config_file:
         configs = json.load(config_file)
@@ -77,13 +81,24 @@ def main():
         url_num = 0
         curr_year = int(time.strftime("%Y", time.gmtime()))
 
-        # for year in range(curr_year, 1900, -1):
-        #     for price_usd in range(0, 500001, 10000):
-        #         for page_num in range(1, 100):
-        while True:
+        combinations_to_process_dict = {}
+        for year in range(curr_year, 1899, -1):
+            for price_usd in range(0, 500001, 10000):
+                for page_num in range(1, 101):
+                    combinations_to_process_dict[(year, price_usd, page_num)] = 0
+        total_combinations = combinations_to_process_left = len(combinations_to_process_dict)
+
+        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, ready to start")
+        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, ",
+              f"combinations to process: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
+
+        while combinations_to_process_left > 0:
             year = random.randint(1900, curr_year)
             price_usd = random.randint(0, 50)*10000
             page_num = random.randint(1, 100)
+
+            if combinations_to_process_dict[(year, price_usd, page_num)] != 0:
+                continue
 
             url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=100&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
@@ -93,10 +108,13 @@ def main():
             card_url_list = get_card_url_list(url)
             if card_url_list == []:
                 # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
-                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found")
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found. mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num}+) to skip processing")
+                combinations_to_process_left -= 101 - page_num
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
+                for page in range(page_num, 101):
+                    combinations_to_process_dict[(year, price_usd, page)] = 1
+
                 continue
-            # else:
-            #     print(*card_url_list, sep="\n", file=log_file)
 
             sql_statements = [
                 f"""                    
@@ -123,6 +141,11 @@ def main():
                 """]
             for sql in sql_statements:
                 cur.execute(sql)
+
+            # print(*card_url_list, sep="\n", file=log_file)
+            combinations_to_process_dict[(year, price_usd, page_num)] = 2
+            combinations_to_process_left -= 1
+            print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
             # if len(card_url_list) < 100:
             #     break
