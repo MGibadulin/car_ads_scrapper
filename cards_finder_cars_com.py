@@ -74,7 +74,15 @@ def main():
 
         cur = con.cursor()
 
-        cur.execute("insert into process_log(process_desc) values('cards_finder_cars_com.py');")
+        cur.execute(
+            """
+                insert into process_log(process_desc, user, host) 
+                select 'cards_finder_cars_com.py' as process_desc, user, host 
+                from information_schema.processlist 
+                where ID=connection_id();
+            """
+        )
+
         cur.execute("select LAST_INSERT_ID() as process_log_id")
         process_log_id = cur.fetchone()[0]
 
@@ -86,11 +94,10 @@ def main():
             for price_usd in range(0, 500001, 10000):
                 for page_num in range(1, 101):
                     combinations_to_process_dict[(year, price_usd, page_num)] = 0
-        total_combinations = combinations_to_process_left = len(combinations_to_process_dict)
 
+        total_combinations = combinations_to_process_left = len(combinations_to_process_dict)
         print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, ready to start")
-        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, ",
-              f"combinations to process: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
+        print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations to process: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
         while combinations_to_process_left > 0:
             year = random.randint(1900, curr_year)
@@ -108,11 +115,12 @@ def main():
             card_url_list = get_card_url_list(url)
             if card_url_list == []:
                 # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
-                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found. mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num}+) to skip processing")
                 combinations_to_process_left -= 101 - page_num
-                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
                 for page in range(page_num, 101):
                     combinations_to_process_dict[(year, price_usd, page)] = 1
+
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found. mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num}+) to skip processing")
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
                 continue
 
@@ -144,11 +152,17 @@ def main():
 
             # print(*card_url_list, sep="\n", file=log_file)
             combinations_to_process_dict[(year, price_usd, page_num)] = 2
-            combinations_to_process_left -= 1
-            print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
-            # if len(card_url_list) < 100:
-            #     break
+            if len(card_url_list) < 100:
+                for page in range(page_num+1, 101):
+                    combinations_to_process_dict[(year, price_usd, page)] = 1
+
+                combinations_to_process_left -= 100 - page_num
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, # of cards found ({len(card_url_list)}) < page_size (100). mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num + 1}+) to skip processing")
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
+            else:
+                combinations_to_process_left -= 1
+                print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
         # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
         print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}")
