@@ -126,7 +126,8 @@ def main():
 
             sql_statements = [
                 f"""                    
-                    insert into ad_groups(group_url, process_log_id) values('{url}', {process_log_id});
+                    insert into ad_groups(year, page_size, page_num, price_min, process_log_id) 
+                    values({year}, 100, {page_num}, {price_usd}, {process_log_id});
                 """,
                 f"""
                     insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 

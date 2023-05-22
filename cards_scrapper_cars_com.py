@@ -236,7 +236,7 @@ def main():
                                   ad_group_id >= {random_ad_group_id}
                             limit 1
                         )
-                        select a.ads_id, concat(a.source_id, a.card_url) as url, g.group_url 
+                        select a.ads_id, concat(a.source_id, a.card_url) as url, g.price_min, g.year 
                         from car_ads_db.ads a
                         join car_ads_db.ad_groups g on a.ad_group_id = g.ad_group_id
                         join cte_random_group rg on g.ad_group_id = rg.ad_group_id    
@@ -256,15 +256,8 @@ def main():
 
             records_fetched = cur.fetchall()
 
-            for ads_id, url, group_url in records_fetched:
+            for ads_id, url, price_usd, year in records_fetched:
                 num += 1
-
-                for arg in group_url.split("?")[1].split("&"):
-                    arg_name, arg_value = arg.split("=")
-                    if arg_name in {"year", "year_min"}:
-                        year = arg_value
-                    if arg_name == "list_price_min":
-                        price_usd = int(arg_value)
 
                 url_parts = url.split("?")
                 url_updated = url_parts[0].replace("/", "-").replace(".", "-").replace(":", "-")
