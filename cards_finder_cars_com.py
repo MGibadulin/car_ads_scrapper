@@ -134,21 +134,13 @@ def main():
                     with cte_new_urls(card_url)
                     as (
                          values {",".join([f"row('{url[len(SITE_URL):]}')" for url in card_url_list])}
-                    ),
-                    cte_url_last_status 
-                    as (
-                         select ads.source_id, ads.card_url, min(ads.ad_status) as ad_status
-                         from car_ads_db.ads
-                         join cte_new_urls cte_new on ads.card_url = cte_new.card_url and
-                                                      ads.source_id = '{SITE_URL}'
-                         group by ads.source_id, ads.card_url
                     )
                     select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
                     from cte_new_urls cte_new
-                    left join cte_url_last_status cte_existing on 
-                                     cte_new.card_url = cte_existing.card_url and
-                                     cte_existing.source_id = '{SITE_URL}'
-                    where (cte_existing.ad_status is null) or (cte_existing.ad_status = 2);
+                    left join car_ads_db.ads on 
+                                     cte_new.card_url = ads.card_url and
+                                     ads.source_id = '{SITE_URL}'
+                    where ads.ad_status is null;
                 """]
             for sql in sql_statements:
                 cur.execute(sql)

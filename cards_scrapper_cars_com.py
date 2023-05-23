@@ -221,16 +221,16 @@ def main():
 
         num = 0
         while True:
-            # get new potion of not yet scrapped urls having the same ad_group_id
+            # get new portion of not yet scrapped urls having the same ad_group_id
             cur.execute("select floor(rand() * (select max(ad_group_id) from ad_groups));")
             random_ad_group_id = cur.fetchone()[0]
 
             cur.execute(
                     f"""
-                        select a.ads_id, concat(a.source_id, a.card_url) as url
-                        from car_ads_db.ads a 
-                        where a.ad_status = 0 and
-                              a.ad_group_id >= {random_ad_group_id}                              
+                        select ads_id, concat(source_id, card_url) as url
+                        from car_ads_db.ads 
+                        where ((ad_status = 0) or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24)) and
+                              ad_group_id >= {random_ad_group_id}                              
                         limit 1;                    
                     """
                 )
@@ -255,6 +255,7 @@ def main():
 
                 parsed_card = {}
                 ad_status = 1
+                year = "-"
                 try:
                     if len(url_parts) == 1:
                         parsed_card = get_parsed_card(url)
@@ -283,18 +284,38 @@ def main():
                     except:
                         ad_status = -1
 
+                # archive the processed data regardless of what is its status
                 cur.execute(
                     f"""
-                        update car_ads_db.ads
-                           set ad_status = {ad_status},
-                               change_status_process_log_id = {process_log_id},
-                               change_status_date = current_timestamp
+                        insert into car_ads_db.ads_archive (ads_id, source_id, card_url, ad_group_id, insert_process_log_id, insert_date, change_status_process_log_id, ad_status)
+                        select ads_id, source_id, card_url, ad_group_id, insert_process_log_id, insert_date, {process_log_id}, {ad_status}
+                        from car_ads_db.ads
                         where ads_id = {ads_id}
                     """
                 )
 
+                if ad_status in {1, -1}:
+                    # ad_status: -1 is considered as bad data, 1 - advert is no longer listed
+                    cur.execute(
+                        f"""
+                            delete from car_ads_db.ads
+                            where ads_id = {ads_id}
+                        """
+                    )
+                else:
+                    # ad_status: 2 - successfully processed. leave only such records
+                    cur.execute(
+                        f"""
+                            update car_ads_db.ads
+                                set ad_status = {ad_status},
+                                    change_status_process_log_id = {process_log_id},
+                                    change_status_date = current_timestamp   
+                            where ads_id = {ads_id}
+                        """
+                    )
+
                 # print(f"{ad_status}, {time.strftime('%X', time.gmtime(time.time() - start_time))}, {ad_status}, num: {num}, ads_id: {ads_id}, year: {year}: {url}", file=log_file)
-                print(f"{time.strftime('%X', time.gmtime(time.time() - start_time))}, {ad_status}, num: {num}, ads_id: {ads_id}, year: {year}: {url}")
+                print(f"{time.strftime('%X', time.gmtime(time.time() - start_time))}, num: {num:>6}, {ad_status:>2}, ads_id: {ads_id:>6}, year: {year:>4}: {url}")
 
         cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
 
