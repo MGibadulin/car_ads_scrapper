@@ -263,22 +263,25 @@ def main():
                     ad_status = -1
 
                 if parsed_card != {}:
-                    # successfully parsed the card (url)
-                    ad_status = 2
-
                     card_id = parsed_card["card_id"]
-                    price_usd = int(parsed_card["price_primary"].replace('$', '').replace(',', ''))  # '$19,999'
-                    year = parsed_card["title"].split()[0]
-                    folder = make_folder(configs["folders"]["base_folder"],
-                                         [
-                                             configs["folders"]["scrapped_data"],
-                                             "cars_com", "json",
-                                             f"{start_time_str}",
-                                             f"{year}",
-                                             f"price_{price_usd}-{price_usd + 9999}"
-                                         ])
-                    with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
-                        f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
+                    try:
+                        price_usd = int(parsed_card["price_primary"].replace('$', '').replace(',', ''))  # '$19,999'
+                        year = parsed_card["title"].split()[0]
+                        folder = make_folder(configs["folders"]["base_folder"],
+                                             [
+                                                 configs["folders"]["scrapped_data"],
+                                                 "cars_com", "json",
+                                                 f"{start_time_str}",
+                                                 f"{year}",
+                                                 f"price_{price_usd}-{price_usd + 9999}"
+                                             ])
+                        with open(f"{folder}/{url_updated}.json", "w", encoding="utf-8") as f:
+                            f.write(str(parsed_card["json"]).replace("\\xa0", " ").replace("\\u2009", " "))
+
+                        # successfully parsed the card (url)
+                        ad_status = 2
+                    except:
+                        ad_status = -1
 
                 cur.execute(
                     f"""
