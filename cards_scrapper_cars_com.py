@@ -227,20 +227,11 @@ def main():
 
             cur.execute(
                     f"""
-                        with cte_random_group
-                        as
-                        (
-                            select ad_group_id as ad_group_id
-                            from car_ads_db.ads
-                            where ad_status = 0 and
-                                  ad_group_id >= {random_ad_group_id}
-                            limit 1
-                        )
-                        select a.ads_id, concat(a.source_id, a.card_url) as url, g.price_min, g.year 
-                        from car_ads_db.ads a
-                        join car_ads_db.ad_groups g on a.ad_group_id = g.ad_group_id
-                        join cte_random_group rg on g.ad_group_id = rg.ad_group_id    
-                        where a.ad_status = 0;                    
+                        select a.ads_id, concat(a.source_id, a.card_url) as url
+                        from car_ads_db.ads a 
+                        where a.ad_status = 0 and
+                              a.ad_group_id >= {random_ad_group_id}                              
+                        limit 1;                    
                     """
                 )
             if cur.rowcount == 0:
@@ -256,7 +247,7 @@ def main():
 
             records_fetched = cur.fetchall()
 
-            for ads_id, url, price_usd, year in records_fetched:
+            for ads_id, url in records_fetched:
                 num += 1
 
                 url_parts = url.split("?")
@@ -276,7 +267,8 @@ def main():
                     ad_status = 2
 
                     card_id = parsed_card["card_id"]
-
+                    price_usd = int(parsed_card["price_primary"].replace('$', '').replace(',', ''))  # '$19,999'
+                    year = parsed_card["title"].split()[0]
                     folder = make_folder(configs["folders"]["base_folder"],
                                          [
                                              configs["folders"]["scrapped_data"],

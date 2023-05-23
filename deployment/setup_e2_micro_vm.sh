@@ -122,6 +122,19 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
     echo "/var/cache/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     echo
+
+    # sudo useradd external-user
+    # sudo passwd external-user
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
+
+    sudo apt install --yes nfs-kernel-server
+    sudo systemctl enable nfs-server
+    sudo echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+    sudo exportfs -a
+    sudo ufw allow 111
+    sudo ufw allow 2049
+    echo
 else
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "The automation script had been executed previously"
@@ -143,10 +156,10 @@ echo
 cd /soft/car_ads_scrapper
 
 # sudo nohup python3 cards_scrapper_cars_com.py &
-python3 cards_finder_cars_com.py
+sudo python3 cards_finder_cars_com.py
 
 sleep 30
-# python3 cards_scrapper_cars_com.py &
+# sudo python3 cards_scrapper_cars_com.py &
 
 
 
