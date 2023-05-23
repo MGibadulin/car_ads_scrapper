@@ -137,11 +137,11 @@ def main():
                     ),
                     cte_url_last_status 
                     as (
-                         select source_id, card_url, min(ad_status) as ad_status
+                         select ads.source_id, ads.card_url, min(ads.ad_status) as ad_status
                          from car_ads_db.ads
                          join cte_new_urls cte_new on ads.card_url = cte_new.card_url and
                                                       ads.source_id = '{SITE_URL}'
-                         group by source_id, card_url
+                         group by ads.source_id, ads.card_url
                     )
                     select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
                     from cte_new_urls cte_new
