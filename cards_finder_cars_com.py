@@ -140,7 +140,7 @@ def main():
                     left join car_ads_db.ads on 
                                      cte_new.card_url = ads.card_url and
                                      ads.source_id = '{SITE_URL}'
-                    where ads.ad_status is null;
+                    where ads.ads_id is null;
                 """]
             for sql in sql_statements:
                 cur.execute(sql)

@@ -156,10 +156,10 @@ echo
 cd /soft/car_ads_scrapper
 
 # sudo nohup python3 cards_scrapper_cars_com.py &
-sudo python3 cards_finder_cars_com.py
+# sudo python3 cards_finder_cars_com.py
 
-sleep 30
-# sudo python3 cards_scrapper_cars_com.py &
+#sleep 30
+sudo python3 cards_scrapper_cars_com.py 
 
 
 

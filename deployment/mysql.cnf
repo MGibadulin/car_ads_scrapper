@@ -28,6 +28,10 @@ skip-external-locking
 skip-host-cache
 skip-name-resolve
 
+innodb_buffer_pool_size = 128M
+# innodb_flush_log_at_trx_commit = 0
+# innodb_flush_method = O_DIRECT
+
 # Remove leading # to revert to previous value for default_authentication_plugin,
 # this will increase compatibility with older clients. For background, see:
 # https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_default_authentication_plugin

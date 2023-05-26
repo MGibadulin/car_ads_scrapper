@@ -293,7 +293,6 @@ def main():
                         where ads_id = {ads_id}
                     """
                 )
-
                 if ad_status in {1, -1}:
                     # ad_status: -1 is considered as bad data, 1 - advert is no longer listed
                     cur.execute(
