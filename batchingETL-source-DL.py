@@ -6,8 +6,6 @@ from pyspark.sql.types import ArrayType, StringType, TimestampType, StructType
 from pyspark.sql.functions import input_file_name, current_timestamp, lit
 
 DEBUG_MODE = True        # instead of a hardcoded value, in future it'll become a config parameter
-DEBUG_TOKENIZED_ATTRS = True
-ARCHIVE_SOURCE_FILES = True
 
 spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
     .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
@@ -283,7 +281,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
-            "process": True
+            "process": DEBUG_MODE
         },
         {
             "ETL_desc": "card_options",
@@ -302,7 +300,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
-            "process": True
+            "process": DEBUG_MODE
         },
         {
             "ETL_desc": "card_info",
@@ -320,7 +318,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
-            "process": True
+            "process": DEBUG_MODE
         },
         {
             "ETL_desc": "card_gallery",
@@ -338,7 +336,7 @@ def save_data(df, etl_desc=None, additional=None, dest_format="csv"):
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
             "mode": "overwrite",
-            "process": True
+            "process": DEBUG_MODE
         },
         {
             "ETL_desc": "card_price_history",
