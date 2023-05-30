@@ -465,10 +465,12 @@ def main():
     tokenized_df = tokenize_stream_data(source_stream_df)
 
     #clean, transform & load
+    stream_data_folder = CONFIGS["folders"]["base_folder"] + "/" + CONFIGS["folders"]["stream_data"]
+
     output_stream_df = tokenized_df \
         .writeStream \
         .trigger(processingTime='10 seconds') \
-        .option("checkpointLocation", "stream/checkpoints") \
+        .option("checkpointLocation", f"{stream_data_folder}/checkpoints/cars_com/") \
         .option("encoding", "UTF-8") \
         .outputMode('append') \
         .foreachBatch(save_batch_data) \

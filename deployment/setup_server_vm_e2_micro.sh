@@ -58,14 +58,14 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
     sudo apt install --yes openjdk-8-jre-headless
     export JAVA_HOME=/usr
-    sudo echo "JAVA_HOME=/usr" >> /etc/environment
+    echo "JAVA_HOME=/usr" | sudo tee -a /etc/environment
     source /etc/environment
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"
     echo
     sudo apt install --yes python3-pip
-    sudo pip3 install -r /soft/car_ads_scrapper/requirements_scrapper.txt
+    sudo pip3 install -r /soft/car_ads_scrapper/requirements.txt
     echo 
     echo
 
@@ -139,6 +139,8 @@ if [ ! -d /mnt/disk-for-data ]; then
     sudo ufw allow 111
     sudo ufw allow 2049
     echo
+
+    # sudo apt install --yes sudo iftop
 else
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "The automation script had been executed previously"
