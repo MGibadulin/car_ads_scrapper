@@ -1,25 +1,67 @@
-import os
+import os, fnmatch
 import time
+import json
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType, StringType, TimestampType, StructType
 from pyspark.sql.functions import input_file_name, current_timestamp, lit
 
-DEBUG_MODE = False        #instead of a hardcoded value, in future it'll become a console argument
+from google.cloud import bigquery
+from google.oauth2 import service_account
 
-spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
-    .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
-    .config("spark.executor.extraJavaOptions", "-Duser.timezone=GMT") \
-    .config("spark.sql.session.timeZone", "UTC") \
-    .config("spark.sql.legacy.timeParserPolicy", "LEGACY") \
-    .config("spark.ui.enabled", False) \
-    .config("spark.sql.parser.escapedStringLiterals", True) \
-    .config("spark.sql.files.openCostInBytes", "50000") \
-    .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
-    .config("spark.executor.memory", "1g") \
-    .config("spark.driver.memory", "1g") \
-    .getOrCreate()
-# sc.setLogLevel(newLevel)
+
+# all below global variables will be populated with the help of read_configs_and_initialize()
+CONFIGS = None
+
+BIGQUERY_CLIENT = None
+BIGQUERY_JOB_CONFIG = None
+CARD_TOKENIZED_TABLE_REF = None
+
+DEBUG_MODE = None
+
+spark = None
+
+
+def read_configs_and_initialize(config_file="config.json"):
+    global CONFIGS, BIGQUERY_CLIENT, BIGQUERY_JOB_CONFIG, CARD_TOKENIZED_TABLE_REF, DEBUG_MODE, spark
+
+    with open(config_file) as config_file:
+        CONFIGS = json.load(config_file)
+
+    credentials = service_account.Credentials.from_service_account_file(
+        filename=CONFIGS["bigquery"]["key_path"], scopes=["https://www.googleapis.com/auth/cloud-platform"],
+    )
+
+    BIGQUERY_CLIENT = bigquery.Client(credentials=credentials, project=credentials.project_id)
+    BIGQUERY_JOB_CONFIG = bigquery.LoadJobConfig()
+    BIGQUERY_JOB_CONFIG.source_format = bigquery.SourceFormat.PARQUET
+
+    for settings_group in CONFIGS["bigquery"]["stream_tables"]:
+        if settings_group["source_id"] == "cars_com":
+            dataset_name = settings_group["destination_dataset_id"]
+            table_name = settings_group["card_tokenized"]
+
+            break
+
+    CARD_TOKENIZED_TABLE_REF = BIGQUERY_CLIENT \
+        .dataset(dataset_name) \
+        .table(table_name)
+
+    DEBUG_MODE = CONFIGS["debug_mode"]
+
+    spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
+        .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
+        .config("spark.executor.extraJavaOptions", "-Duser.timezone=GMT") \
+        .config("spark.sql.session.timeZone", "UTC") \
+        .config("spark.sql.legacy.timeParserPolicy", "LEGACY") \
+        .config("spark.ui.enabled", False) \
+        .config("spark.sql.parser.escapedStringLiterals", True) \
+        .config("spark.sql.files.openCostInBytes", "50000") \
+        .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
+        .config("spark.executor.memory", "600m") \
+        .config("spark.driver.memory", "600m") \
+        .getOrCreate()
+
 
 def make_folder(start_folder, subfolders_chain):
     folder = start_folder
@@ -226,13 +268,27 @@ def process_source_files(df, dest_folder, mode="archive_source_files"):
                 pass
 
 
-def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest_format="parquet"):
-    micro_batch_df = micro_batch_df.coalesce(1)
-    micro_batch_df.persist()
+def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="archive_source_files", dest_format="parquet"):
+    def find_files(pattern, path):
+        result = []
+        for root, dirs, files in os.walk(path):
+            for name in files:
+                if fnmatch.fnmatch(name, pattern):
+                    result.append(os.path.join(root, name))
+        return result
 
-    micro_batch_df, bad_data_df = clean_data(micro_batch_df, additional="")
 
-    print(f"epoch: {epoch_id}, # of records: {micro_batch_df.count()}")
+    try:
+        micro_batch_df = micro_batch_df.coalesce(1)
+        micro_batch_df.persist()
+
+        micro_batch_df, bad_data_df = clean_data(micro_batch_df, additional="archive_baddata_source_files")
+
+        print(f"{time.strftime('%m/%d %X', time.gmtime())} epoch: {epoch_id}, # of records: {micro_batch_df.count()}")
+    except:
+        return
+
+    stream_data_folder = CONFIGS["folders"]["base_folder"] + "/" + CONFIGS["folders"]["stream_data"]
 
     ETL_configs = [
         {
@@ -241,7 +297,7 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;options;gallery;url;scrap_date;source_id;dl_loaded_date;input_file_name",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
-            "mode": "append",
+            "mode": "overwrite",
             "process": DEBUG_MODE
         },
         {
@@ -250,8 +306,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "attr_list": "card_id;title;price_primary;price_history;location;labels;description;vehicle_history;comment;options;gallery;url;scrap_date;source_id;dl_loaded_date;input_file_name",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": f"stream_data/cars_com/{dest_format}/car_card_direct"},
-            "mode": "append",
+            "options": {"header": True, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_direct"},
+            "mode": "overwrite",
             "process": True
         },
         {
@@ -260,7 +316,7 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "attr_list": "card_id;vehicle;year;price_range;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
             "options": {"header": True, "truncate": False},
-            "mode": "append",
+            "mode": "overwrite",
             "process": DEBUG_MODE
         },
         {
@@ -269,8 +325,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "attr_list": "card_id;vehicle;year;price_usd;location;home_delivery;virtual_appointments;included_warranty;VIN;transmission;transmission_type;engine;engine_vol;fuel;mpg;milage;milage_unit;body;drive;color;vehicle_history_map['1-owner vehicle'] as one_owner;vehicle_history_map['Accidents or damage'] as accidents_or_damage;vehicle_history_map['Clean title'] as clean_title;vehicle_history_map['Personal use only'] as personal_use_only;comment;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "year;price_range",
             "partitionBy": "",
-            "options": {"header": True, "path": f"stream_data/cars_com/{dest_format}/car_card_tokenized"},
-            "mode": "append",
+            "options": {"header": True, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_tokenized"},
+            "mode": "overwrite",
             "process": True
         },
         {
@@ -289,8 +345,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "attr_list": "card_id;explode(options) as option_group;scrap_date;source_id;dl_loaded_date|card_id;option_group.category;explode(option_group.items) as item;scrap_date;source_id;dl_loaded_date",
             # "partitionBy": "category",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False, "path": f"stream_data/cars_com/{dest_format}/car_card_options"},
-            "mode": "append",
+            "options": {"header": True, "truncate": False, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_options"},
+            "mode": "overwrite",
             "process": True
         },
         {
@@ -307,8 +363,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "format": dest_format,
             "attr_list": "card_id;url;source_file_name;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "truncate": False, "path": f"stream_data/cars_com/{dest_format}/car_card_info"},
-            "mode": "append",
+            "options": {"header": True, "truncate": False, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_info"},
+            "mode": "overwrite",
             "process": True
         },
         {
@@ -325,8 +381,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "format": dest_format,
             "attr_list": "card_id;posexplode(gallery) as (num, url);scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": f"stream_data/cars_com/{dest_format}/car_card_gallery"},
-            "mode": "append",
+            "options": {"header": True, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_gallery"},
+            "mode": "overwrite",
             "process": True
         },
         {
@@ -343,8 +399,8 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
             "format": dest_format,
             "attr_list": "card_id;explode(price_history_split) as price_change;scrap_date;source_id;dl_loaded_date|card_id;to_date(split(price_change, ': ')[0], 'MM/dd/yy') as date;to_number(split(price_change, ': ')[1], '$9,999,999,999') as price;scrap_date;source_id;dl_loaded_date",
             "partitionBy": "",
-            "options": {"header": True, "path": f"stream_data/cars_com/{dest_format}/card_price_history"},
-            "mode": "append",
+            "options": {"header": True, "path": f"{stream_data_folder}/cars_com/{dest_format}/card_price_history"},
+            "mode": "overwrite",
             "process": True
         }
     ]
@@ -383,20 +439,30 @@ def save_batch_data(micro_batch_df, epoch_id, etl_desc=None, additional="", dest
 
     micro_batch_df.unpersist()
 
+    # upload to BigQuery
+    parquets_files_to_upload = find_files("*.parquet", f"{stream_data_folder}/cars_com/{dest_format}/card_tokenized")
+
+    with open(parquets_files_to_upload[0], "rb") as source_file:
+        job = BIGQUERY_CLIENT.load_table_from_file(
+            source_file,
+            CARD_TOKENIZED_TABLE_REF,
+            job_config=BIGQUERY_JOB_CONFIG
+        )
+    # job.result()
+
+    print(f"{time.strftime('%m/%d %X', time.gmtime())} uploaded\n")
+
 
 def main():
+    read_configs_and_initialize()
+
     #extract
     source_stream_df = create_input_file_stream()
-    # source_df = save_data(source_df,
-    #                       etl_desc="card (direct)",
-    #                       additional="reopen_df",
-    #                       dest_format="parquet")
 
-    #transform
+    #tokenize as part of transform phase
     tokenized_df = tokenize_stream_data(source_stream_df)
-    # cleaned_df = clean_data(tokenized_df, additional="")
 
-    #load
+    #clean, transform & load
     output_stream_df = tokenized_df \
         .writeStream \
         .trigger(processingTime='10 seconds') \
@@ -405,11 +471,6 @@ def main():
         .outputMode('append') \
         .foreachBatch(save_batch_data) \
         .start()
-
-    # save_data(cleaned_df,
-    #           etl_desc="card (tokenized);card_options;card_info;card_gallery;card_price_history",
-    #           additional="debug info",
-    #           dest_format="parquet")
 
     output_stream_df.awaitTermination()
 

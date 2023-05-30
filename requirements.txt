@@ -3,3 +3,5 @@ requests
 pyspark
 pymysql
 cryptography
+google-cloud-bigquery
+google-auth

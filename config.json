@@ -1,10 +1,10 @@
 {
   "audit_db": {
-      "host": "127.0.0.1",
-      "user": "timoti",
-      "password": "enter1",
-      "database": "car_ads_db",
-      "autocommit": 1    
+    "host": "127.0.0.1",
+    "user": "timoti",
+    "password": "enter1",
+    "database": "car_ads_db",
+    "autocommit": 1
   },
 
   "folders": {
@@ -15,8 +15,28 @@
     "batch_data": "batch_data",
     "logs": "logs",
     "scrapped_data": "scrapped_data",
+    "stream_data": "stream_data",
 
     "program": "/soft/car_ads_scrapper"
-  }
+  },
+
+  "bigquery": {
+    "key_path": "bigquery-credentials.json",
+    "project_name": "paid-project-346208",
+    "stream_tables": [
+      {
+        "source_id": "cars_com",
+        "destination_dataset_id": "car_ads_ds_staging_test",
+
+        "card_tokenized": "cars_com_card_tokenized_stream",
+        "card_gallery": "cars_com_card_gallery_stream",
+        "card_info": "cars_com_card_info_stream",
+        "card_options": "cars_com_card_gallery_stream",
+        "card_price_history": "cars_com_card_gallery_stream"
+      }
+    ]
+  },
+
+  "debug_mode": 0
 }
 
