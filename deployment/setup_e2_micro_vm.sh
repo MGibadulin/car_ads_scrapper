@@ -53,9 +53,13 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo 
     echo
 
-    #sudo apt install --yes openjdk-8-jre-headless
-    #export JAVA_HOME=/usr/bin/java              #$(which java)
-    #echo "JAVA_HOME=/usr/bin/java" >> /etc/environment
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing java"
+    echo
+    sudo apt install --yes openjdk-8-jre-headless
+    export JAVA_HOME=/usr
+    sudo echo "JAVA_HOME=/usr" >> /etc/environment
+    source /etc/environment
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"

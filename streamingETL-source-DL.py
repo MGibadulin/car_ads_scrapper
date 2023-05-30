@@ -94,8 +94,10 @@ def create_input_file_stream():
         .add("description", StringType(), False) \
         .add("scrap_date", TimestampType(), False)
 
-    # print(os.getcwd() + "/scrapped_data/cars_com/json/*/*/*/")
+    # print(base_folder+ "/scrapped_data/cars_com/json/*/*/*/")
     # read source files - go through all the existing files
+    source_folder = f"{CONFIGS['folders']['base_folder']}/{CONFIGS['folders']['scrapped_data']}"
+
     source_df = spark \
         .readStream \
         .option("maxFilesPerTrigger", 100) \
@@ -103,7 +105,7 @@ def create_input_file_stream():
         .schema(user_schema) \
         .option("encoding", "UTF-8") \
         .option("multiLine", True) \
-        .option("path", "scrapped_data/cars_com/json/*/*/*/") \
+        .option("path", f"{source_folder}/cars_com/json/*/*/*/") \
         .load() \
         .withColumn("input_file_name", input_file_name()) \
         .withColumn("source_id", lit("cars.com scrapper")) \
