@@ -110,8 +110,8 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (1GB)"
     echo
-    sudo mkdir -v /var/cache/swap
-    cd /var/cache/swap
+    sudo mkdir -v /mnt/disk-for-data/swap
+    cd /mnt/disk-for-data/swap
     sudo dd if=/dev/zero of=swapfile bs=1K count=1M
 
     echo "------------------------------------------------------------"
@@ -124,17 +124,17 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
     echo
-    echo "/var/cache/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+    echo "/mnt/disk-for-data/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     echo
 
     # sudo useradd external-user
     # sudo passwd external-user
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Sharing /mnt/disk-for-data/car_ads_scrapper network folder "
 
     sudo apt install --yes nfs-kernel-server
     sudo systemctl enable nfs-server
-    sudo echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
+    echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
     sudo exportfs -a
     sudo ufw allow 111
     sudo ufw allow 2049
@@ -165,7 +165,7 @@ cd /soft/car_ads_scrapper
 # sudo python3 cards_finder_cars_com.py
 
 #sleep 30
-sudo python3 cards_scrapper_cars_com.py 
+sudo python3  streamingETL-cars-com-to-BQ.py
 
 
 
