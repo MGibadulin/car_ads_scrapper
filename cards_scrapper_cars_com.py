@@ -216,27 +216,32 @@ def main():
         cur = con.cursor()
 
         cur.execute("insert into process_log(process_desc) values('cards_scrapper_cars_com.py');")
-        cur.execute("select LAST_INSERT_ID() as process_log_id;")
+        cur.execute("select last_insert_id() as process_log_id;")
         process_log_id = cur.fetchone()[0]
 
         num = 0
         while True:
-            # get new portion of not yet scrapped urls having the same ad_group_id
             cur.execute("select floor(rand() * (select max(ad_group_id) from ad_groups));")
-            random_ad_group_id = cur.fetchone()[0]
+            random_ads_id = cur.fetchone()[0]
 
             cur.execute(
                     f"""
-                        select ads_id, concat(source_id, card_url) as url
-                        from car_ads_db.ads 
-                        where ((ad_status = 0) or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24)) and
-                              ad_group_id >= {random_ad_group_id}                              
-                        limit 1;                    
+                        with cte_random_record_group as
+                        (
+                            select ads_id, 
+                                   concat(source_id, card_url) as url, 
+                                   ifnull(ad_status/(1 + timestampdiff(hour, change_status_date, current_timestamp)), 0) as score
+                            from car_ads_db.ads 
+                            where ((ad_status = 0) or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24)) and
+                                  ads_id >= {random_ads_id}                              
+                            limit 10
+                        )
+                        select ads_id, url from cte_random_record_group order by score limit 1;                  
                     """
                 )
             if cur.rowcount == 0:
                 # check if there is still what to do
-                cur.execute("select 1 from car_ads_db.ads where ad_status = 0 limit 1;")
+                cur.execute("select 1 from car_ads_db.ads where ad_status = 0 or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24) limit 1;")
 
                 if cur.rowcount == 0:
                     # job is done
