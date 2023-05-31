@@ -62,6 +62,7 @@ def read_configs_and_initialize(config_file="config.json"):
         .config("spark.executor.heartbeatInterval", "1800s") \
         .getOrCreate()
 
+    spark.sparkContext.setLogLevel("WARN")
         # .config("spark.executor.memory", "600m") \
         # .config("spark.driver.memory", "800m") \
 
