@@ -114,14 +114,18 @@ if [ ! -d /mnt/disk-for-data ]; then
     # sudo useradd external-user
     # sudo passwd external-user
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Sharing /mnt/disk-for-data/car_ads_scrapper network folder "
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Sharing /mnt/disk-for-data/car_ads_scrapper network folder & setting up firewall"
 
     sudo apt install --yes nfs-kernel-server
     sudo systemctl enable nfs-server
-    echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+    echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm1(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+    echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm2(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+    echo "/mnt/disk-for-data/car_ads_scrapper  scrapping-vm1(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
+    echo "/mnt/disk-for-data/car_ads_scrapper  scrapping-vm2(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
     sudo exportfs -a
     sudo ufw allow 111
     sudo ufw allow 2049
+    sudo ufw allow 3306
     echo
 
     echo "------------------------------------------------------------"
@@ -136,11 +140,26 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"
     echo
     sudo apt install --yes python3-pip
-    sudo pip3 install -r /soft/car_ads_scrapper/requirements.txt
+    sudo pip3 install -r /soft/car_ads_scrapper/requirements_scrapper.txt
     echo
     echo
 
-    # sudo apt install --yes sudo iftop
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Waiting for everything to be started and mounted"
+    echo
+    echo
+    # hope 1m is enough...
+    sleep 60
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"
+    echo
+    cd /soft/car_ads_scrapper
+
+    # sudo nohup python3 cards_scrapper_cars_com.py &
+    # sudo python3 cards_finder_cars_com.py
+
+    # sudo python3  streamingETL-cars-com-to-BQ.py
 else
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "The automation script had been executed previously"
@@ -155,17 +174,17 @@ echo
 # hope 1m is enough...
 sleep 60
 
-echo "------------------------------------------------------------"
-echo $(date "+%Y-%m-%d %H:%M:%S") "Starting cards_finder_cars_com.py"
-echo
-
-cd /soft/car_ads_scrapper
-
-# sudo nohup python3 cards_scrapper_cars_com.py &
-# sudo python3 cards_finder_cars_com.py
-
-#sleep 30
-sudo python3  streamingETL-cars-com-to-BQ.py
-
-
+#echo "------------------------------------------------------------"
+#echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"
+#echo
+#
+#cd /soft/car_ads_scrapper
+#
+## sudo nohup python3 cards_scrapper_cars_com.py &
+## sudo python3 cards_finder_cars_com.py
+#
+##sleep 30
+#sudo python3  streamingETL-cars-com-to-BQ.py
+#
+#
 

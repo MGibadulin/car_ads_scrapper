@@ -1,6 +1,6 @@
 {
   "audit_db": {
-    "host": "127.0.0.1",
+    "host": "data-server-vm",
     "user": "timoti",
     "password": "enter1",
     "database": "car_ads_db",
