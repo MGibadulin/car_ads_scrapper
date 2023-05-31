@@ -46,14 +46,6 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Cloning github repository"
-    echo
-    sudo mkdir /soft
-    sudo git clone https://github.com/timoti1/car_ads_scrapper /soft/car_ads_scrapper
-    echo 
-    echo
-
-    echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Installing java"
     echo
     sudo apt install --yes openjdk-8-jre-headless
@@ -62,11 +54,23 @@ if [ ! -d /mnt/disk-for-data ]; then
     source /etc/environment
 
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (1GB)"
     echo
-    sudo apt install --yes python3-pip
-    sudo pip3 install -r /soft/car_ads_scrapper/requirements.txt
-    echo 
+    sudo mkdir -v /mnt/disk-for-data/swap
+    cd /mnt/disk-for-data/swap
+    sudo dd if=/dev/zero of=swapfile bs=1K count=1M
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Enabling swapping"
+    echo
+    sudo chmod 600 swapfile
+    sudo mkswap swapfile
+    sudo swapon swapfile
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
+    echo
+    echo "/mnt/disk-for-data/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
     echo
 
     # set the rdbms up
@@ -107,26 +111,6 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
     echo
 
-    echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Creating a swap file (1GB)"
-    echo
-    sudo mkdir -v /mnt/disk-for-data/swap
-    cd /mnt/disk-for-data/swap
-    sudo dd if=/dev/zero of=swapfile bs=1K count=1M
-
-    echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Enabling swapping"
-    echo
-    sudo chmod 600 swapfile
-    sudo mkswap swapfile
-    sudo swapon swapfile
-
-    echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Adding record to /etc/fstab for automounting swap file"
-    echo
-    echo "/mnt/disk-for-data/swap/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
-    echo
-
     # sudo useradd external-user
     # sudo passwd external-user
     echo "------------------------------------------------------------"
@@ -138,6 +122,22 @@ if [ ! -d /mnt/disk-for-data ]; then
     sudo exportfs -a
     sudo ufw allow 111
     sudo ufw allow 2049
+    echo
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Cloning github repository"
+    echo
+    sudo mkdir /soft
+    sudo git clone https://github.com/timoti1/car_ads_scrapper /soft/car_ads_scrapper
+    echo
+    echo
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing python dependencies"
+    echo
+    sudo apt install --yes python3-pip
+    sudo pip3 install -r /soft/car_ads_scrapper/requirements.txt
+    echo
     echo
 
     # sudo apt install --yes sudo iftop
