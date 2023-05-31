@@ -14,7 +14,7 @@ if [ ! -d /mnt/disk-for-data ]; then
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Mounting car_ads_scrapper network folder "
-
+    sudo apt update
     sudo apt install --yes nfs-common
     sudo mount data-server-vm:/mnt/disk-for-data/car_ads_scrapper /mnt/disk-for-data/car_ads_scrapper
     echo "data-server-vm:/mnt/disk-for-data/car_ads_scrapper /mnt/disk-for-data/car_ads_scrapper nfs defaults 0 0" | sudo tee -a /etc/fstab
@@ -47,6 +47,14 @@ if [ ! -d /mnt/disk-for-data ]; then
     sudo apt install --yes mysql-client
     echo
     echo
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Installing java"
+    echo
+    sudo apt install --yes openjdk-8-jre-headless
+    export JAVA_HOME=/usr
+    echo "JAVA_HOME=/usr" | sudo tee -a /etc/environment
+    source /etc/environment
 
     # sudo useradd external-user
     # sudo passwd external-user

@@ -122,10 +122,10 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo "/mnt/disk-for-data/car_ads_scrapper  spark-vm2(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
     echo "/mnt/disk-for-data/car_ads_scrapper  scrapping-vm1(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
     echo "/mnt/disk-for-data/car_ads_scrapper  scrapping-vm2(rw,sync,no_subtree_check,no_root_squash)" | sudo tee -a /etc/exports
-    sudo exportfs -a
     sudo ufw allow 111
     sudo ufw allow 2049
     sudo ufw allow 3306
+    sudo exportfs -a
     echo
 
     echo "------------------------------------------------------------"

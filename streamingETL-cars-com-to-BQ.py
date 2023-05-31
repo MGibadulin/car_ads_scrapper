@@ -58,11 +58,12 @@ def read_configs_and_initialize(config_file="config.json"):
         .config("spark.sql.parser.escapedStringLiterals", True) \
         .config("spark.sql.files.openCostInBytes", "50000") \
         .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
-        .config("spark.executor.memory", "600m") \
-        .config("spark.driver.memory", "800m") \
         .config("spark.network.timeout", "3600s") \
         .config("spark.executor.heartbeatInterval", "1800s") \
         .getOrCreate()
+
+        # .config("spark.executor.memory", "600m") \
+        # .config("spark.driver.memory", "800m") \
 
 
 def make_folder(start_folder, subfolders_chain):
