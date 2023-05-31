@@ -145,6 +145,13 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Setting up db backup schedule"
+    sudo cp /soft/car_ads_scrapper/deployment/mysql_daily_backup_script.sh /etc/cron.hourly/
+    sudo chmod ugo+x /etc/cron.hourly/mysql_daily_backup_script.sh
+    echo
+    echo
+
+    echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Waiting for everything to be started and mounted"
     echo
     echo

@@ -49,7 +49,7 @@ def read_configs_and_initialize(config_file="config.json"):
 
     DEBUG_MODE = CONFIGS["debug_mode"]
 
-    spark = SparkSession.builder.master("local[*]").appName("car ads batch ETL (source to DL)") \
+    spark = SparkSession.builder.master("local[*]").appName("car ads streaming ETL (source to BigQuery)") \
         .config("spark.driver.extraJavaOptions", "-Duser.timezone=GMT") \
         .config("spark.executor.extraJavaOptions", "-Duser.timezone=GMT") \
         .config("spark.sql.session.timeZone", "UTC") \
@@ -59,7 +59,9 @@ def read_configs_and_initialize(config_file="config.json"):
         .config("spark.sql.files.openCostInBytes", "50000") \
         .config("spark.sql.sources.parallelPartitionDiscovery.threshold", 32) \
         .config("spark.executor.memory", "600m") \
-        .config("spark.driver.memory", "600m") \
+        .config("spark.driver.memory", "800m") \
+        .config("spark.network.timeout", "3600s") \
+        .config("spark.executor.heartbeatInterval", "1800s") \
         .getOrCreate()
 
 
