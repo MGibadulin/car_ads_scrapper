@@ -4,7 +4,7 @@
 # in case we haven't used that external disk previously, we need to format it
 # sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
 
-if [ ! -d /mnt/disk-for-data ]; then
+if [ ! -f /soft/car_ads_scrapper/scrapping-vm-configured ]; then
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Creating data folders"
     echo
@@ -73,6 +73,13 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
     # hope 1m is enough...
     sleep 60
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Create scrapping-vm-configured file as a sign of the installation completed"
+    echo
+    cd /soft/car_ads_scrapper
+    sudo touch /soft/car_ads_scrapper/scrapping-vm-configured
+    echo
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"

@@ -4,7 +4,7 @@
 # in case we haven't used that external disk previously, we need to format it
 # sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
 
-if [ ! -d /mnt/disk-for-data ]; then
+if [ ! -f /soft/car_ads_scrapper/data-server-vm-configured ]; then
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Mounting external data disk"
     echo
@@ -42,7 +42,8 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo $(date "+%Y-%m-%d %H:%M:%S") "Starting mysql-server:8.0 docker container"
     echo
     sudo docker run --name mysql --restart=always -p 3306:3306 -v /mnt/disk-for-data/mysql:/var/lib/mysql/ -d -e "MYSQL_ROOT_PASSWORD=enter1" mysql/mysql-server:8.0
-    echo 
+    sleep 30
+    echo
     echo
 
     echo "------------------------------------------------------------"
@@ -156,16 +157,21 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
     echo
     # hope 1m is enough...
-    sleep 60
+    sleep 30
+
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Create data-server-vm-configured file as a sign of the installation completed"
+    echo
+    cd /soft/car_ads_scrapper
+    sudo touch /soft/car_ads_scrapper/data-server-vm-configured
+    echo
 
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"
     echo
-    cd /soft/car_ads_scrapper
 
     # sudo nohup python3 cards_scrapper_cars_com.py &
     # sudo python3 cards_finder_cars_com.py
-
     # sudo python3  streamingETL-cars-com-to-BQ.py
 else
     echo "------------------------------------------------------------"
@@ -178,8 +184,9 @@ echo "------------------------------------------------------------"
 echo $(date "+%Y-%m-%d %H:%M:%S") "Waiting for everything to be started and mounted"
 echo
 echo
+
 # hope 1m is enough...
-sleep 60
+sleep 30
 
 #echo "------------------------------------------------------------"
 #echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"

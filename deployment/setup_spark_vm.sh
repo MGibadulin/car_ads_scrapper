@@ -4,7 +4,7 @@
 # in case we haven't used that external disk previously, we need to format it
 # sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
 
-if [ ! -d /mnt/disk-for-data ]; then
+if [ ! -f /soft/car_ads_scrapper/spark-vm-configured ]; then
     echo "------------------------------------------------------------"
     echo $(date "+%Y-%m-%d %H:%M:%S") "Creating data folders"
     echo
@@ -55,6 +55,8 @@ if [ ! -d /mnt/disk-for-data ]; then
     export JAVA_HOME=/usr
     echo "JAVA_HOME=/usr" | sudo tee -a /etc/environment
     source /etc/environment
+    echo
+    echo
 
     # sudo useradd external-user
     # sudo passwd external-user
@@ -76,11 +78,16 @@ if [ ! -d /mnt/disk-for-data ]; then
     echo
 
     echo "------------------------------------------------------------"
-    echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Create spark-vm-configured file as a sign of the installation completed"
     echo
     cd /soft/car_ads_scrapper
-    # sudo python3 streamingETL-cars-com-to-BQ.py
+    sudo touch /soft/car_ads_scrapper/spark-vm-configured
+    echo
 
+    echo "------------------------------------------------------------"
+    echo $(date "+%Y-%m-%d %H:%M:%S") "Starting your application"
+    echo
+    # sudo python3 streamingETL-cars-com-to-BQ.py
     # sudo python3 cards_finder_cars_com.py
 else
     echo "------------------------------------------------------------"
