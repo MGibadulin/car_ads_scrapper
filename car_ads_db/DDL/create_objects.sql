@@ -19,8 +19,10 @@ create table if not exists ads
 create table if not exists ad_groups
 (
     ad_group_id         int not null primary key auto_increment,
-    
-    group_url           varchar(255) not null,
+    price_min           int not null,
+    page_size           tinyint not null,
+    year                smallint not null,
+    page_num s          mallint not null,
     process_log_id      int not null,
     insert_date         datetime not null default current_timestamp
 );
@@ -30,8 +32,8 @@ create table if not exists process_log
     process_log_id      int not null primary key auto_increment,
     
     process_desc        varchar(255) not null,
-    `user`              varchar(255) not null,
-    host                varchar(255) not null,
+    `user`              varchar(255),
+    host                varchar(255),
     start_date          datetime not null default current_timestamp,
     end_date            datetime
 );
