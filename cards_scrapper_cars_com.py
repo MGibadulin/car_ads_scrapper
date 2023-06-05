@@ -46,7 +46,6 @@ def get_parsed_card(url, debug=0, headers=DEFAULT_HEADER):
         except:
             pass
 
-
         basic_content = soup.find("div", class_="basics-content-wrapper")
 
         basic_section = basic_content.find("section", class_="sds-page-section basics-section")
@@ -198,59 +197,175 @@ def make_folder(start_folder, subfolders_chain):
 
     return folder
 
+
+
+def execute_sql(con, sql_statements, fetch_mode="fetchone"):
+    cur = con.cursor()
+    for sql in sql_statements:
+        cur.execute(sql)
+
+    res = None
+    if cur.rowcount > 0:
+        if fetch_mode == "fetchone":
+            res = cur.fetchone()
+        else:
+            res = cur.fetchall()
+
+    return res
+
+
+def audit_start(con, context):
+    process_desc = context["process_desc"]
+    sql_statements = [
+        f"""
+            insert into process_log(process_desc, user, host) 
+            select '{process_desc}', user, host 
+            from information_schema.processlist 
+            where ID = connection_id();
+        """,
+        "select last_insert_id() as process_log_id;"
+    ]
+
+    return execute_sql(con, sql_statements)
+
+
+def audit_end(con, context):
+    process_log_id = context["process_log_id"]
+
+    sql_statements = [f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};"]
+
+    return execute_sql(con, sql_statements)
+
+
+def find_random_cards_to_parse(con, context):
+    refresh_time = context["refresh_time"]
+    num = context["limit"] if context["limit"] != 0 else 999999
+
+    while True:
+        random_ads_id = execute_sql(con, ["select floor(rand() * (select max(ad_group_id) from ad_groups));"])[0]
+
+        records_fetched = execute_sql(con,
+            [
+                f"""
+                    with cte_random_record_group as
+                    (
+                        select ads_id, 
+                               concat(source_id, card_url) as url, 
+                               ifnull(ad_status/(1 + timestampdiff(hour, change_status_date, current_timestamp)), 0) as score
+                        from car_ads_db.ads 
+                        where ((ad_status = 0) or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > {refresh_time})) and
+                              ad_group_id >= {random_ads_id}                              
+                        limit {max(10, num)}
+                    )
+                    select ads_id, url 
+                    from cte_random_record_group 
+                    order by score 
+                    limit {num};                  
+                """
+            ],
+            fetch_mode="fetchall"
+        )
+
+        if records_fetched != None:
+            break
+
+        # check if there is still what to do
+        if execute_sql(con,
+                [
+                    f"""
+                        select 1 
+                        from car_ads_db.ads 
+                        where ad_status = 0 or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > {refresh_time}) 
+                        limit 1;
+                    """
+                ]
+            ) != None:
+            continue
+
+        # job is done
+        break
+
+    return records_fetched
+
+
+def update_and_archive(con, context):
+    ads_id = context["ads_id"]
+    process_log_id = context["process_log_id"]
+    ad_status = context["ad_status"]
+
+    # archive the processed data regardless of what is its status
+    execute_sql(con,
+        [
+            f"""
+                insert into car_ads_db.ads_archive(
+                    ads_id, 
+                    source_id, 
+                    card_url, 
+                    ad_group_id, 
+                    insert_process_log_id, 
+                    insert_date, 
+                    change_status_process_log_id, 
+                    ad_status
+                )
+                select 
+                    ads_id, 
+                    source_id, 
+                    card_url, 
+                    ad_group_id, 
+                    insert_process_log_id, 
+                    insert_date, 
+                    {process_log_id}, 
+                    {ad_status}
+                from car_ads_db.ads
+                where ads_id = {ads_id}
+            """
+        ]
+    )
+
+    if ad_status in {1, -1}:
+        # ad_status: -1 is considered as bad data, 1 - advert is no longer listed
+        execute_sql(con,
+            [
+                f"""
+                    delete from car_ads_db.ads
+                    where ads_id = {ads_id}
+                """
+            ]
+        )
+    else:
+        # ad_status: 2 - successfully processed. leave only such records
+        execute_sql(con,
+            [
+                f"""
+                    update car_ads_db.ads
+                        set ad_status = {ad_status},
+                            change_status_process_log_id = {process_log_id},
+                            change_status_date = current_timestamp   
+                    where ads_id = {ads_id}
+                """
+            ]
+        )
+
+
 def main():
     with open("config.json") as config_file:
         configs = json.load(config_file)
 
     con = pymysql.connect(**configs["audit_db"])
 
-    # make_folder(configs["folders"]["base_folder"], [configs["folders"]["logs"], "cars_com", start_time_str])
     make_folder(configs["folders"]["base_folder"], [configs["folders"]["scrapped_data"], "cars_com", "json", start_time_str])
 
-    # LOG_FILENAME_CARS_COM = f"{configs['folders']['base_folder']}/{configs['folders']['logs']}/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
-
-    # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
     with con:
-        # print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
+        process_log_id = audit_start(con, {"process_desc": "cards_scrapper_cars_com.py"})[0]
 
         cur = con.cursor()
 
-        cur.execute("insert into process_log(process_desc) values('cards_scrapper_cars_com.py');")
-        cur.execute("select last_insert_id() as process_log_id;")
-        process_log_id = cur.fetchone()[0]
-
         num = 0
         while True:
-            cur.execute("select floor(rand() * (select max(ad_group_id) from ad_groups));")
-            random_ads_id = cur.fetchone()[0]
+            records_fetched = find_random_cards_to_parse(con, {"limit": 1, "refresh_time": 24})
 
-            cur.execute(
-                    f"""
-                        with cte_random_record_group as
-                        (
-                            select ads_id, 
-                                   concat(source_id, card_url) as url, 
-                                   ifnull(ad_status/(1 + timestampdiff(hour, change_status_date, current_timestamp)), 0) as score
-                            from car_ads_db.ads 
-                            where ((ad_status = 0) or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24)) and
-                                  ads_id >= {random_ads_id}                              
-                            limit 10
-                        )
-                        select ads_id, url from cte_random_record_group order by score limit 1;                  
-                    """
-                )
-            if cur.rowcount == 0:
-                # check if there is still what to do
-                cur.execute("select 1 from car_ads_db.ads where ad_status = 0 or (ad_status = 2 and timestampdiff(hour, change_status_date, current_timestamp) > 24) limit 1;")
-
-                if cur.rowcount == 0:
-                    # job is done
-                    break
-                else:
-                    # there is still what to do, let's choose another random_ad_group_id
-                    continue
-
-            records_fetched = cur.fetchall()
+            if records_fetched == None:
+                break
 
             for ads_id, url in records_fetched:
                 num += 1
@@ -289,41 +404,12 @@ def main():
                     except:
                         ad_status = -1
 
-                # archive the processed data regardless of what is its status
-                cur.execute(
-                    f"""
-                        insert into car_ads_db.ads_archive (ads_id, source_id, card_url, ad_group_id, insert_process_log_id, insert_date, change_status_process_log_id, ad_status)
-                        select ads_id, source_id, card_url, ad_group_id, insert_process_log_id, insert_date, {process_log_id}, {ad_status}
-                        from car_ads_db.ads
-                        where ads_id = {ads_id}
-                    """
-                )
-                if ad_status in {1, -1}:
-                    # ad_status: -1 is considered as bad data, 1 - advert is no longer listed
-                    cur.execute(
-                        f"""
-                            delete from car_ads_db.ads
-                            where ads_id = {ads_id}
-                        """
-                    )
-                else:
-                    # ad_status: 2 - successfully processed. leave only such records
-                    cur.execute(
-                        f"""
-                            update car_ads_db.ads
-                                set ad_status = {ad_status},
-                                    change_status_process_log_id = {process_log_id},
-                                    change_status_date = current_timestamp   
-                            where ads_id = {ads_id}
-                        """
-                    )
+                update_and_archive(con, {"ads_id": ads_id , "process_log_id": process_log_id, "ad_status": ad_status})
 
-                # print(f"{ad_status}, {time.strftime('%X', time.gmtime(time.time() - start_time))}, {ad_status}, num: {num}, ads_id: {ads_id}, year: {year}: {url}", file=log_file)
                 print(f"{time.strftime('%X', time.gmtime(time.time() - start_time))}, num: {num:>6}, {ad_status:>2}, ads_id: {ads_id:>6}, year: {year:>4}: {url}")
 
-        cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
+        audit_end(con, {"process_log_id": process_log_id})
 
-        # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
 
 
 if __name__ == "__main__":

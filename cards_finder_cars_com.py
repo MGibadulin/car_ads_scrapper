@@ -119,7 +119,8 @@ def save_card_url_list(con, card_url_list, context):
                                  cte_new.card_url = ads.card_url and
                                  ads.source_id = '{source_id}'
                 where ads.ads_id is null;
-            """]
+            """
+    ]
 
     execute_sql(con, sql_statements)
 
