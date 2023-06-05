@@ -10,7 +10,7 @@ import os
 
 
 start_time = time.time()
-start_time_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime(start_time))
+# start_time_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.gmtime(start_time))
 
 headers = requests.utils.default_headers()
 headers.update({
@@ -57,34 +57,81 @@ def make_folder(start_folder, subfolders_chain):
 def progress(total, left):
     return ((total-left)/total) * 100
 
+
+def execute_sql(con, sql_statements, fetch_mode="fetchone"):
+    cur = con.cursor()
+    for sql in sql_statements:
+        cur.execute(sql)
+
+    res = None
+    if cur.rowcount > 0:
+        if fetch_mode == "fetchone":
+            res = cur.fetchone()
+        else:
+            res = cur.fetchall()
+
+    return res
+
+
+def audit_start(con, context):
+    process_desc = context["process_desc"]
+    sql_statements = [
+        f"""
+            insert into process_log(process_desc, user, host) 
+            select '{process_desc}', user, host 
+            from information_schema.processlist 
+            where ID = connection_id();
+        """,
+        "select last_insert_id() as process_log_id;"
+    ]
+
+    return execute_sql(con, sql_statements)
+
+
+def audit_end(con, context):
+    process_log_id = context["process_log_id"]
+    sql_statements = [f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};"]
+
+    return execute_sql(con, sql_statements)
+
+def save_card_url_list(con, card_url_list, context):
+    year = context["year"]
+    page_size = context["page_size"]
+    page_num = context["page_num"]
+    price_min = context["price_min"]
+    source_id = context["source_id"]
+    process_log_id = context["process_log_id"]
+
+    sql_statements = [
+        f"""                    
+                insert into ad_groups(year, page_size, page_num, price_min, process_log_id) 
+                values({year}, {page_size}, {page_num}, {price_min}, {process_log_id});
+        """,
+        f"""
+                insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
+                with cte_new_urls(card_url)
+                as (
+                     values {", ".join([f" row('{url[len(source_id):]}')" for url in card_url_list])}
+                )
+                select '{source_id}' as source_id, cte_new.card_url, last_insert_id() as ad_group_id, {process_log_id}
+                from cte_new_urls cte_new
+                left join car_ads_db.ads on 
+                                 cte_new.card_url = ads.card_url and
+                                 ads.source_id = '{source_id}'
+                where ads.ads_id is null;
+            """]
+
+    execute_sql(con, sql_statements)
+
+
 def main():
     with open("config.json") as config_file:
         configs = json.load(config_file)
 
     con = pymysql.connect(**configs["audit_db"])
 
-    # make_folder(configs["folders"]["logs"], ["cars_com", start_time_str])
-    # make_folder(configs["folders"]["scrapped_data"], ["cars_com", "json", start_time_str])
-
-    # LOG_FILENAME_CARS_COM = f"{configs['folders']['logs']}/cars_com/{start_time_str}/cards_finder_cars_com_log.txt"
-
-    # with open(LOG_FILENAME_CARS_COM, 'w', newline="", encoding="utf-8") as log_file, con:
     with con:
-        # print(f"start time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
-
-        cur = con.cursor()
-
-        cur.execute(
-            """
-                insert into process_log(process_desc, user, host) 
-                select 'cards_finder_cars_com.py' as process_desc, user, host 
-                from information_schema.processlist 
-                where ID=connection_id();
-            """
-        )
-
-        cur.execute("select LAST_INSERT_ID() as process_log_id")
-        process_log_id = cur.fetchone()[0]
+        process_log_id = audit_start(con, {"process_desc": "cards_finder_cars_com.py"})[0]
 
         url_num = 0
         curr_year = int(time.strftime("%Y", time.gmtime()))
@@ -109,60 +156,51 @@ def main():
 
             url = f"{SITE_URL}/shopping/results/?list_price_max={price_usd + 9999}&list_price_min={price_usd}&maximum_distance=all&page_size=100&page={page_num}&stock_type=used&year_max={year}&year_min={year}&zip=60606"
 
-            # print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}", file=log_file)
             print(f"\ntime: {time.strftime('%X', time.gmtime(time.time() - start_time))}, url: {url}")
 
             card_url_list = get_card_url_list(url)
             if card_url_list == []:
-                # print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found", file=log_file)
-                combinations_to_process_left -= 101 - page_num
                 for page in range(page_num, 101):
+                    if combinations_to_process_dict[(year, price_usd, page)] == 1:
+                        break
+
                     combinations_to_process_dict[(year, price_usd, page)] = 1
+                    combinations_to_process_left -= 1
 
                 print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, no cards found. mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num}+) to skip processing")
                 print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
                 continue
 
-            sql_statements = [
-                f"""                    
-                    insert into ad_groups(year, page_size, page_num, price_min, process_log_id) 
-                    values({year}, 100, {page_num}, {price_usd}, {process_log_id});
-                """,
-                f"""
-                    insert into car_ads_db.ads(source_id, card_url, ad_group_id, insert_process_log_id) 
-                    with cte_new_urls(card_url)
-                    as (
-                         values {",".join([f"row('{url[len(SITE_URL):]}')" for url in card_url_list])}
-                    )
-                    select '{SITE_URL}' as source_id, cte_new.card_url, LAST_INSERT_ID() as ad_group_id, {process_log_id}
-                    from cte_new_urls cte_new
-                    left join car_ads_db.ads on 
-                                     cte_new.card_url = ads.card_url and
-                                     ads.source_id = '{SITE_URL}'
-                    where ads.ads_id is null;
-                """]
-            for sql in sql_statements:
-                cur.execute(sql)
+            context = {
+                "year": year,
+                "page_size": 100,
+                "page_num": page_num,
+                "price_min": price_usd,
+                "source_id": SITE_URL,
+                "process_log_id": process_log_id
+            }
+            save_card_url_list(con, card_url_list, context)
 
-            # print(*card_url_list, sep="\n", file=log_file)
             combinations_to_process_dict[(year, price_usd, page_num)] = 2
 
             if len(card_url_list) < 100:
                 for page in range(page_num+1, 101):
-                    combinations_to_process_dict[(year, price_usd, page)] = 1
+                    if combinations_to_process_dict[(year, price_usd, page)] == 1:
+                        break
 
-                combinations_to_process_left -= 100 - page_num
+                    combinations_to_process_dict[(year, price_usd, page)] = 1
+                    combinations_to_process_left -= 1
+
                 print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, # of cards found ({len(card_url_list)}) < page_size (100). mark url search parameters ({year}, {price_usd}, {price_usd + 9999}, {page_num + 1}+) to skip processing")
                 print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
             else:
                 combinations_to_process_left -= 1
                 print(f"time: {time.strftime('%X', time.gmtime(time.time() - start_time))}, combinations left: {combinations_to_process_left}, progress: {round(progress(total_combinations, combinations_to_process_left), 3)}%")
 
-        # print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}", file=log_file)
         print(f"\nend time (GMT): {time.strftime('%X', time.gmtime())}")
 
-        cur.execute(f"update process_log set end_date = current_timestamp where process_log_id = {process_log_id};")
+        audit_end(con, {"process_log_id": process_log_id})
 
 
 if __name__ == "__main__":

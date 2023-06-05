@@ -15,6 +15,9 @@
 # The server defaults are faster for transactions and fast SELECTs.
 # Adjust sizes as needed, experiment to find the optimal values.
 
+general_log_file = query.log
+general_log = 1
+
 performance_schema = off
 
 max_connections = 5
