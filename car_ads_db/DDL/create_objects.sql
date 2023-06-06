@@ -22,7 +22,7 @@ create table if not exists ad_groups
     price_min           int not null,
     page_size           tinyint not null,
     year                smallint not null,
-    page_num s          mallint not null,
+    page_num            smallint not null,
     process_log_id      int not null,
     insert_date         datetime not null default current_timestamp
 );
