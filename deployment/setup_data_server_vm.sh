@@ -93,7 +93,13 @@ if [ ! -f /soft/car_ads_scrapper/data-server-vm-configured ]; then
     echo $(date "+%Y-%m-%d %H:%M:%S") "Updating database (mysqld) settings"
     echo
     sudo docker exec -i mysql bash -c "cat > /etc/my.cnf" < /soft/car_ads_scrapper/deployment/mysql.cnf
-    echo 
+#    if [ ! -f /var/lib/mysql/slow-query.log ]; then
+#      mkdir touch /var/lib/mysql/slow-query.log && chown mysql:mysql /var/lib/mysql/slow-query.log
+#    fi
+#    if [ ! -f /var/lib/mysql/query.log ]; then
+#      mkdir touch /var/lib/mysql/query.log && chown mysql:mysql /var/lib/mysql/query.log
+#    fi
+    echo
     echo
 
     # mysql --user=root --password="$(cat /root/.mysql)"

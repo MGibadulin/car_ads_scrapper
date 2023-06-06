@@ -15,13 +15,13 @@
 # The server defaults are faster for transactions and fast SELECTs.
 # Adjust sizes as needed, experiment to find the optimal values.
 
-general_log_file = /var/lib/mysql/query.log
+general_log_file = query.log
 general_log = 1
+log_output = 'TABLE'
 
 slow_query_log = 1
-long_query_time = 3
-slow_query_log_file = /var/lib/mysql/slow-query.log
-log-queries-not-using-indexes = 1
+long_query_time = 0
+slow_query_log_file = slow-query.log
 
 performance_schema = off
 
