@@ -15,12 +15,12 @@
 # The server defaults are faster for transactions and fast SELECTs.
 # Adjust sizes as needed, experiment to find the optimal values.
 
-general_log_file = /var/log/mysql/query.log
+general_log_file = /var/lib/mysql/query.log
 general_log = 1
 
 slow_query_log = 1
 long_query_time = 3
-slow_query_log_file = /var/log/mysql/slow-query.log
+slow_query_log_file = /var/lib/mysql/slow-query.log
 log-queries-not-using-indexes = 1
 
 performance_schema = off
@@ -47,7 +47,7 @@ innodb_buffer_pool_size = 128M
 
 datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
-secure-file-priv=/var/lib/mysql-files
+secure-file-priv=/var/lib/mysql/files
 user=mysql
 
 pid-file=/var/run/mysqld/mysqld.pid
